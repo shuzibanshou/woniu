@@ -15,10 +15,13 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     checkEnv();
     //启动UDP协议
     udpSocket = new QUdpSocket(this);
-    udpSocketFile = new QUdpSocket(this);
+    //启动tcp协议
+    tcpSocketFileServer = new QTcpServer(this);
+    tcpSocketFileClient = new QTcpSocket(this);
+
     broadcastTimer = new QTimer(this);
     scanDevicesTimer = new QTimer(this);
-    retransMissionTimer = new QTimer(this);
+    //retransMissionTimer = new QTimer(this);
 //    for(quint16 port = initPort;; port++){
 //        if(udpSocket->bind(port)){
 //            actualPort = port;
@@ -31,20 +34,20 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     } else {
        qDebug("绑定UDP广播端口成功");
     }
-    if(!udpSocketFile->bind(filePort)){
-       qDebug("绑定UDP文件端口失败,%s",qPrintable(udpSocketFile->errorString()));
-       udpSocketFile->bind(filePort);
+    if(!tcpSocketFileServer->listen(QHostAddress::Any,filePort)){
+       qDebug("TCP监听失败,%s",qPrintable(tcpSocketFileServer->errorString()));
+       tcpSocketFileServer->listen(QHostAddress::Any,filePort);
     } else {
-       qDebug("绑定UDP文件端口成功");
+       qDebug("TCP监听成功");
     }
     connect(udpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(onSocketStateChanged(QAbstractSocket::SocketState)));
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onSocketReadyRead()));
     connect(broadcastTimer,SIGNAL(timeout()),this,SLOT(lanBroadcast()));
     connect(scanDevicesTimer,SIGNAL(timeout()),this,SLOT(scanDevices()));
-    connect(retransMissionTimer,SIGNAL(timeout()),this,SLOT(retransMissionPacket()));
+    //connect(retransMissionTimer,SIGNAL(timeout()),this,SLOT(retransMissionPacket()));
 
     //收发文件信号槽
-    connect(udpSocketFile,SIGNAL(readyRead()),this,SLOT(onSocketFileReadyRead()));
+    connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
 
     lanBroadcast();
     broadcastTimer->start(broadcastInterval);
@@ -444,11 +447,11 @@ void woniu:: openFile(){
         file.setFileName(filePath);
         bool succ = file.open(QIODevice::ReadOnly);
         if(succ){
-            //file.read();
-            //向文件接收方发送文件信息
+            //连接文件接收方的服务器并向其发送文件信息
+            tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
             QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
             //qDebug() << fi;
-            udpSocketFile->writeDatagram(fi.toUtf8().insert(0,MessageType::fileInfo),QHostAddress(ip),filePort);
+            tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
         } else {
             qDebug() << "打开文件失败";
         }
@@ -467,26 +470,13 @@ void woniu:: openMsgDialog(){
     QString ip = o->property("ip").toString();
     qDebug() << ip;
 }
-/**
- * 文件消息达到的时候弹出一个模态对话框进行确定
- * @brief woniu::onSocketFileReadyRead
- */
-void woniu::onSocketFileReadyRead()
-{
-    while(udpSocketFile->hasPendingDatagrams()) {
-        QByteArray datagram;
-        datagram.resize(static_cast<int>(udpSocketFile->pendingDatagramSize()));
-        QHostAddress remoteIPv6Addr;     //远程主机地址ipv6
-        udpSocketFile->readDatagram(datagram.data(),datagram.size(),&remoteIPv6Addr,&remotePort);
 
-        QString receiveData = QString::fromUtf8(datagram.data());
-        remoteIPv4Addr = QHostAddress(remoteIPv6Addr.toIPv4Address()).toString();
-        if(!receiveData.isEmpty()){
-            parseFileMessage(datagram.data());
-        } else {
-            qDebug() << "empty";
-        }
-    }
+void woniu::onNewConnection()
+{
+    QTcpSocket* temp = tcpSocketFileServer->nextPendingConnection();
+    QString remoteIP = temp->peerAddress().toString();
+    tcpSocketFileClientList = QMap<QString, QTcpSocket*>();
+    tcpSocketFileClientList.insert(remoteIP,temp);
 }
 
 /**
@@ -524,31 +514,13 @@ void woniu::parseFileMessage(QByteArray data)
 
             //qDebug() << "接收方已同意,开始分块并发送文件";
             fileSentSize = 0;
-            if(sendLock){
-                quint64 sendUnit = 4096;    //每次计划发送字节数
-                quint64 unitBytes = 0;      //每次实际发送字节数
 
-                sendingBuff = file.read(sendUnit);
-                unitBytes = sendingBuff.length();
-
-                if(unitBytes > 0){
-                    QByteArray udpPacket = sendingBuff;
-                    udpPacket.insert(0,paddingQByteArray(sendingBuffIndex,8)).insert(0,MessageType::fileContent);
-                    qint64 res = udpSocketFile->writeDatagram(udpPacket,QHostAddress(remoteIPv4Addr),remotePort);
-                    if(res > 0){
-                        //UDP数据包发送成功后启动重发定时器
-                        retransMissionTimer->start(retransMissionInterval);
-                        fileSentSize += unitBytes;
-                        sendProgress->setValue(((float)fileSentSize/fileSize)*100);
-                        sendLock = false;
-                    }
-                }
-                //qDebug() << "1文件已发送" << fileSentSize;
-                if(fileSentSize == fileSize){
-                    //qDebug() << "文件发送完毕";
-                    file.close();
-                }
+            //qDebug() << "1文件已发送" << fileSentSize;
+            if(fileSentSize == fileSize){
+                //qDebug() << "文件发送完毕";
+                file.close();
             }
+
         } else if(MessageType::fileContent == first){
             //接收文件内容
             //获取content的前面四个字节的文件块索引值 如果文件块索引已成功写入 则忽略并反馈一个写入成功消息
@@ -590,7 +562,7 @@ void woniu::parseFileMessage(QByteArray data)
                     if(curSaveFileSize == saveFileSize){
                         msg.clear();
                         msg.append(MessageType::sentFile);
-                        udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
+                        //udpSocketFile->write(msg,QHostAddress(remoteIPv4Addr),remotePort);
                         curSaveFileSize = saveFileSize = 0;
                         receiveFileHandle.close();
                         recvProgress->close();
@@ -603,21 +575,19 @@ void woniu::parseFileMessage(QByteArray data)
                         //提示框是阻塞的 要放在最后面
                         QMessageBox::information(this, tr("成功"),QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
                     } else {
-                        udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
+                        //udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
                     }
                 }
             }
         } else if(MessageType::rejectFile == first){
 
         } else if(MessageType::sentFile == first){
-            //文件发送完毕 关闭定时器 清空变量 进行清扫工作
-            retransMissionTimer->stop();
+            //文件发送完毕 清空变量 进行清扫工作
             fileName = "";
             fileSize = 0;
             sendingBuff = 0;
             sendingBuffIndex = 0;
             fileSentSize = 0;
-            sendLock = true;
             sendProgress->close();
         } else if(MessageType::recUdpPackSucc == first){
             //获取content的前面四个字节的文件块索引值
@@ -627,52 +597,28 @@ void woniu::parseFileMessage(QByteArray data)
             if(recBuffIndex == sendingBuffIndex){
                 //收到接收方的成功通知 释放锁 停掉定时器并再次发送一个UDP包
                 ++sendingBuffIndex;
-                sendLock = true;
-                retransMissionTimer->stop();
-                if(sendLock){
-                    quint64 sendUnit = 4096;    //每次计划发送字节数
-                    quint64 unitBytes = 0;      //每次实际发送字节数
+                quint64 sendUnit = 4096;    //每次计划发送字节数
+                quint64 unitBytes = 0;      //每次实际发送字节数
 
-                    sendingBuff = file.read(sendUnit);
-                    unitBytes = sendingBuff.length();
+                sendingBuff = file.read(sendUnit);
+                unitBytes = sendingBuff.length();
 
-                    if(unitBytes > 0){
-                        QByteArray udpPacket = sendingBuff;
-                        udpPacket.insert(0,paddingQByteArray(sendingBuffIndex,8)).insert(0,MessageType::fileContent);
-                        qint64 res = udpSocketFile->writeDatagram(udpPacket,QHostAddress(remoteIPv4Addr),remotePort);
-                        if(res > 0){
-                            retransMissionTimer->start(retransMissionInterval);
-                            fileSentSize += unitBytes;
-                            sendProgress->setValue(((float)fileSentSize/fileSize)*100);
-                            sendLock = false;
-                        }
-                    }
-                    //qDebug() << "2文件已发送" << fileSentSize;
-                    if(fileSentSize == fileSize){
-                        qDebug() << "文件发送完毕";
-                        file.close();
-                    }
-                    //progress* ps = new progress(this);
-                    //ps->show();
+                if(unitBytes > 0){
+                    QByteArray udpPacket = sendingBuff;
+                    udpPacket.insert(0,paddingQByteArray(sendingBuffIndex,8)).insert(0,MessageType::fileContent);
+                    //qint64 res = udpSocketFile->writeDatagram(udpPacket,QHostAddress(remoteIPv4Addr),remotePort);
+//                    if(res > 0){
+//                        fileSentSize += unitBytes;
+//                        sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+//                    }
                 }
-            }
-
-        } else if(MessageType::recUdpPackFail == first){
-            QByteArray udpPacket = sendingBuff;
-            udpPacket.insert(0,paddingQByteArray(sendingBuffIndex,8)).insert(0,MessageType::fileContent);
-            //收到接收方失败的通知 则重发一次当前的UDP包
-            qint64 res = udpSocketFile->writeDatagram(udpPacket,QHostAddress(remoteIPv4Addr),remotePort);
-            if(res > 0){
-                retransMissionTimer->start(retransMissionInterval);
-                sendLock = false;
-            }
-            //qDebug() << "3文件已发送" << fileSentSize;
-            if(fileSentSize == fileSize){
-                //qDebug() << "文件发送完毕";
-                if(file.isOpen()){
+                //qDebug() << "2文件已发送" << fileSentSize;
+                if(fileSentSize == fileSize){
+                    qDebug() << "文件发送完毕";
                     file.close();
                 }
             }
+
         }
     }  catch (QException e) {
        qDebug() << e.what();
@@ -701,7 +647,7 @@ void woniu::acceptFile()
     if(succ){
         QByteArray msg;
         msg.append(MessageType::acceptFile);
-        udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
+        //udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
         quint64 blocksCount = qCeil((float)saveFileSize / sendUnit);    //必须要先转float才行
         fileBlocks = new QBitArray(blocksCount);
         //时间埋点
@@ -722,26 +668,3 @@ void woniu::rejectFile()
     qDebug() << "拒绝接收文件";
 }
 
-/**
- * 重发UDP数据包槽函数
- * @brief woniu::retransMissionPacket
- */
-void woniu::retransMissionPacket()
-{
-    QByteArray udpPacket = sendingBuff;
-    udpPacket.insert(0,paddingQByteArray(sendingBuffIndex,8)).insert(0,MessageType::fileContent);
-    retransMissionTimer->stop();
-    qint64 res = udpSocketFile->writeDatagram(udpPacket,QHostAddress(remoteIPv4Addr),remotePort);
-    if(res > 0){
-        retransMissionTimer->start(retransMissionInterval);
-        sendLock = false;
-    }
-
-    qDebug() << "4文件已发送" << fileSentSize;
-    if(fileSentSize == fileSize){
-        qDebug() << "文件发送完毕";
-        if(file.isOpen()){
-            file.close();
-        }
-    }
-}

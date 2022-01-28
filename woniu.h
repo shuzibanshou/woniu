@@ -5,6 +5,8 @@
 #include <QBitArray>
 #include <QPushButton>
 #include <QNetworkInterface>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QUdpSocket>
 #include <QDebug>
 #include <QHostInfo>
@@ -68,10 +70,12 @@ private:
     quint32 fileEndTransTime;                                       //文件传输结束时间
 
     //文件相关
-    QUdpSocket* udpSocketFile;                                      //UDP收发文件的socket
-    quint16 filePort = 20001;                                       //UDP收发文件的UDP端口
+    QTcpServer* tcpSocketFileServer;                                //TCP收发文件的server socket
+    QTcpSocket* tcpSocketFileClient;
+    QMap<QString,QTcpSocket*> tcpSocketFileClientList;                         //TCP收发文件的client socket
+    quint16 filePort = 20001;                                       //TCP收发文件的端口
+
     quint16 remotePort;                                             //当前与其进行文件收发通信的远端UDP端口 默认等于filePort
-    quint16 remoteFilePort;
     QString remoteIPv4Addr;                                         //当前与其进行文件收发通信的远端IPv4地址
     QFile file;                                                     //发送文件对象
     QString fileName = "";                                          //当前发送文件名
@@ -80,7 +84,7 @@ private:
     quint64 sendingBuffIndex = 0;                                   //当前正在发送的字节块在fileBlocks数组中的索引值
     quint64 fileSentSize = 0;                                       //当前已发送的总字节数 bytes
 
-    bool sendLock = true;                                           //当前发送UDP包的锁 当锁为true可发送 false则不可发送
+    //bool sendLock = true;                                           //当前发送UDP包的锁 当锁为true可发送 false则不可发送
 
     QFile receiveFileHandle;                                        //接收文件对象
     QString saveFileName;                                           //当前接收文件名
@@ -105,8 +109,8 @@ private:
     quint16 unactiveTimeout = 8;                                    //非活跃设备超时时间 默认 8秒
     QTimer*  broadcastTimer;                                        //局域网UDP循环广播定时器
     QTimer*  scanDevicesTimer;                                      //扫描活跃设备定时器
-    QTimer*  retransMissionTimer;                                   //UDP数据包重发定时器
-    quint16 retransMissionInterval = 200;                           //UDP数据包重发定时器时间间隔
+    //QTimer*  retransMissionTimer;                                   //UDP数据包重发定时器
+    //quint16 retransMissionInterval = 200;                           //UDP数据包重发定时器时间间隔
 
     QMap<QString,deviceItem> lanDevices;                            //局域网内设备IPv4地址合集-定时扫描踢出下线设备
     QMap<QString,deviceItem> newLanDevices;                         //下一次扫描新的局域网内设备IPv4地址合集 比对旧的数据 分别新增或更新widgetItem
@@ -126,11 +130,11 @@ private slots:
     void scanDevices();                                             //扫描活跃设备
     void openFile();                                                //打开文件管理器
     void openMsgDialog();                                           //打开发送消息框
-    void onSocketFileReadyRead();
+    void onNewConnection();
     //void on_remoteDevice_clicked(const QModelIndex &index);
     void acceptFile();                                              //确认接收文件
     void rejectFile();                                              //拒收文件
-    void retransMissionPacket();                                      //重发UDP数据包
+    //void retransMissionPacket();                                      //重发UDP数据包
 };
 
 
