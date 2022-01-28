@@ -450,8 +450,8 @@ void woniu:: openFile(){
             //连接文件接收方的服务器并向其发送文件信息
             tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
             QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
-            //qDebug() << fi;
-            tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
+            qint32 block = tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
+            qDebug() << block;
         } else {
             qDebug() << "打开文件失败";
         }
