@@ -71,8 +71,10 @@ private:
 
     //文件相关
     QTcpServer* tcpSocketFileServer;                                //TCP收发文件的server socket
-    QTcpSocket* tcpSocketFileClient;
-    QMap<QString,QTcpSocket*> tcpSocketFileClientList;                         //TCP收发文件的client socket
+    QTcpSocket* tcpSocketFileClient;                                //TCP收发文件客户端
+    QTcpSocket* tcpSocketFileClientList;                           //TCP server新连接的socket
+    //QMap<QString,QTcpSocket*> tcpSocketFileClientList;              //TCP收发文件的client socket
+
     quint16 filePort = 20001;                                       //TCP收发文件的端口
 
     quint16 remotePort;                                             //当前与其进行文件收发通信的远端UDP端口 默认等于filePort
@@ -130,10 +132,11 @@ private slots:
     void openFile();                                                //打开文件管理器
     void openMsgDialog();                                           //打开发送消息框
     void onNewConnection();
+    void onReadyRead();                                             //读取socket数据的槽函数
     //void on_remoteDevice_clicked(const QModelIndex &index);
     void acceptFile();                                              //确认接收文件
     void rejectFile();                                              //拒收文件
-    //void retransMissionPacket();                                      //重发UDP数据包
+    //void retransMissionPacket();                                  //重发UDP数据包
 };
 
 

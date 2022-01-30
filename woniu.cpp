@@ -48,8 +48,13 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 
     //新连接
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
+
     //收发文件信号槽
-    connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
+//    QMap<QString, QTcpSocket*>::iterator tcpClientIter = tcpSocketFileClientList.begin();
+//    while(tcpClientIter != tcpSocketFileClientList.end()){
+//        connect(tcpClientIter.value(),SIGNAL(readyRead()),this,SLOT(onReadyRead()));
+//    }
+    connect(tcpSocketFileClientList,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
 
     lanBroadcast();
     broadcastTimer->start(broadcastInterval);
@@ -432,11 +437,19 @@ void woniu:: openMsgDialog(){
 
 void woniu::onNewConnection()
 {
-    QTcpSocket* temp = tcpSocketFileServer->nextPendingConnection();
-    QString remoteIP = temp->peerAddress().toString();
-    tcpSocketFileClientList = QMap<QString, QTcpSocket*>();
-    tcpSocketFileClientList.insert(remoteIP,temp);
+//    QTcpSocket* temp = tcpSocketFileServer->nextPendingConnection();
+//    QString remoteIP = temp->peerAddress().toString();
+//    tcpSocketFileClientList = QMap<QString, QTcpSocket*>();
+//    tcpSocketFileClientList.insert(remoteIP,temp);
+    tcpSocketFileClientList = tcpSocketFileServer->nextPendingConnection();
 }
+
+
+void woniu::onReadyRead(){
+    QByteArray receiveByte = tcpSocketFileClientList->readAll();
+    parseFileMessage(receiveByte);
+}
+
 
 /**
  * 接收远程主机发送的文件消息
@@ -476,7 +489,7 @@ void woniu::parseFileMessage(QByteArray data)
 
             //qDebug() << "1文件已发送" << fileSentSize;
             if(fileSentSize == fileSize){
-                //qDebug() << "文件发送完毕";
+                qDebug() << "文件发送完毕";
                 file.close();
             }
 
