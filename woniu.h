@@ -99,7 +99,6 @@ private:
     QMap<QString,QString> localIPv4;                                //保存本地所有IPv4地址的变量
     QString getDeviceInfo();                                        //获取设备信息
     QString localDevice;                                            //保存拼接的设备信息
-    //QString getLocalIPv4();                                       //获取本地IPv4地址
 
     void checkEnv();  //检查环境
     void checkBroadcast(QString,QString);                           //检查广播迂回地址

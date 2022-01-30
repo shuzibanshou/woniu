@@ -46,8 +46,10 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     connect(scanDevicesTimer,SIGNAL(timeout()),this,SLOT(scanDevices()));
     //connect(retransMissionTimer,SIGNAL(timeout()),this,SLOT(retransMissionPacket()));
 
-    //收发文件信号槽
+    //新连接
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
+    //收发文件信号槽
+    connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
 
     lanBroadcast();
     broadcastTimer->start(broadcastInterval);
@@ -72,31 +74,6 @@ QString woniu::protocolName(QAbstractSocket::NetworkLayerProtocol protocol)
             return "UnknownNetwork";
     }
 }
-
-/**
- * 获取本地IPV4地址(废弃 有可能获取到虚拟机路由ip)
- * @brief woniu::getLocalIPv4
- * @return
- */
-//QString woniu::getLocalIPv4()
-//{
-//    QString localIP = "";   //本地IPv4地址
-//    QString hostName = QHostInfo::localHostName();
-//    QHostInfo hostInfo = QHostInfo::fromName(hostName);
-
-//    QList<QHostAddress> addrList = hostInfo.addresses();
-//    for(int i = 0; i < addrList.size(); i++){
-//        if(addrList[i].protocol() == QAbstractSocket::IPv4Protocol){
-//            localIP = addrList[i].toString();
-//            qDebug() << localIP;
-//            //return localIP;
-//        }
-//    }
-//    return localIP;
-//}
-
-
-
 
 /**
  * 读取所有本地地址信息（物理网卡和虚拟机）
@@ -238,13 +215,6 @@ void woniu::scanDevices()
 
     while (iter != newLanDevices.end())
     {
-        //第0种写法  这种写法Linux下删除节点会有问题
-//        if(now - iter.value() >= unactiveTimeout){
-//            lanDevices.remove(iter.key());
-//        } else {
-//            ui->textEdit->append("远程主机IPv4:"+iter.key());
-//        }
-//        iter++;
 
         //第一种写法
         if(now - iter.value().timestamp >= unactiveTimeout){
@@ -264,17 +234,6 @@ void woniu::scanDevices()
         }
     }
     lanDevices = newLanDevices;
-
-    //第二种写法
-//    QMapIterator<QString, deviceItem> iter(lanDevices);
-//    if(iter.hasNext()){
-//        iter.next();
-//        if(now - iter.value().timestamp >= unactiveTimeout){
-//            lanDevices.remove(iter.key());
-//        } else {
-//            addWidgetItem(iter.value());
-//        }
-//    }
 }
 
 /**
@@ -451,7 +410,7 @@ void woniu:: openFile(){
             tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
             QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
             qint32 block = tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
-            qDebug() << block;
+            qDebug() << "连接成功，发送字节数"+QString::number(block);
         } else {
             qDebug() << "打开文件失败";
         }
