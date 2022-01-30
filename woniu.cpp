@@ -54,7 +54,6 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 //    while(tcpClientIter != tcpSocketFileClientList.end()){
 //        connect(tcpClientIter.value(),SIGNAL(readyRead()),this,SLOT(onReadyRead()));
 //    }
-    connect(tcpSocketFileClientList,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
 
     lanBroadcast();
     broadcastTimer->start(broadcastInterval);
@@ -441,7 +440,9 @@ void woniu::onNewConnection()
 //    QString remoteIP = temp->peerAddress().toString();
 //    tcpSocketFileClientList = QMap<QString, QTcpSocket*>();
 //    tcpSocketFileClientList.insert(remoteIP,temp);
+
     tcpSocketFileClientList = tcpSocketFileServer->nextPendingConnection();
+    connect(tcpSocketFileClientList,SIGNAL(readyRead()),this,SLOT(onReadyRead()));
 }
 
 
