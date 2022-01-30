@@ -132,7 +132,8 @@ private slots:
     void openFile();                                                //打开文件管理器
     void openMsgDialog();                                           //打开发送消息框
     void onNewConnection();
-    void onServerReadyRead();                                             //读取socket数据的槽函数
+    void onServerReadyRead();                                       //读取socket数据的槽函数
+    void onClientReadyRead();
     //void on_remoteDevice_clicked(const QModelIndex &index);
     void acceptFile();                                              //确认接收文件
     void rejectFile();                                              //拒收文件
