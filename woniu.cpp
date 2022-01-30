@@ -447,8 +447,8 @@ void woniu::onNewConnection()
 
 
 void woniu::onReadyRead(){
-    QByteArray receiveByte = tcpSocketFileClientList->readAll();
-    parseFileMessage(receiveByte);
+    QByteArray receiveBytes = tcpSocketFileClientList->readAll();
+    parseFileMessage(receiveBytes);
 }
 
 
@@ -477,7 +477,6 @@ void woniu::parseFileMessage(QByteArray data)
             rFile->setSaveFilePath(saveDirPath);
             saveFilePath = saveDirPath + "/" + saveFileName;
 
-            //rFile->exec();
             rFile->show();
         } else if(MessageType::acceptFile == first){
             //打开传输进度窗口 读取文件并发送
@@ -487,6 +486,18 @@ void woniu::parseFileMessage(QByteArray data)
 
             //qDebug() << "接收方已同意,开始分块并发送文件";
             fileSentSize = 0;
+            qint64 blockLen = 0;
+            do{
+                blockLen = 0;
+                char buff[4096] = {0};
+                blockLen = file.read(buff,sizeof(buff));
+                if(blockLen > 0){
+                    blockLen = tcpSocketFileClient->write(buff,sizeof(buff));
+                    if(blockLen > 0){
+                        fileSentSize += blockLen;
+                    }
+                }
+            } while(blockLen > 0);
 
             //qDebug() << "1文件已发送" << fileSentSize;
             if(fileSentSize == fileSize){
@@ -504,54 +515,48 @@ void woniu::parseFileMessage(QByteArray data)
             recBuffIndex = QString(recBuffIndexArr).toUInt();
             fileContent.append(content.data() + 8, content.size() - 8);
 
-            QByteArray msg;
-            if(fileBlocks->at(recBuffIndex)){
-                msg.append(MessageType::recUdpPackSucc).append(QString::number(recBuffIndex).toUtf8());
-            } else {
-                //qDebug() << recBuffIndex;
-                //qDebug() << fileContent;
-                //qDebug() << fileContent.length();
-                if(fileContent.length() > 0){
-                    qint64 len = 0;
-                    len = receiveFileHandle.write(fileContent);
-                    //qDebug() << len;
-                    if(len > 0){
-                        //接收成功
-                        msg.append(MessageType::recUdpPackSucc).append(QString::number(recBuffIndex).toUtf8());
-                        curSaveFileSize += len;
-                        //字节块索引置为1
-                        fileBlocks->setBit(recBuffIndex);
-                        //qDebug() << "接收成功" << curSaveFileSize;
-                        recvProgress->setValue(((float)curSaveFileSize/saveFileSize)*100);
-                    } else if(len == -1) {
-                        //接收失败带上文件块索引通知重发
-                        msg.append(MessageType::recUdpPackFail).append(QString::number(recBuffIndex).toUtf8());
-                        qDebug() << "接收失败,通知重发";
-                    }
+            //qDebug() << recBuffIndex;
+            //qDebug() << fileContent;
+            //qDebug() << fileContent.length();
+            if(fileContent.length() > 0){
+                qint64 len = 0;
+                len = receiveFileHandle.write(fileContent);
+                //qDebug() << len;
+                if(len > 0){
+                    //接收成功
+                    //msg.append(MessageType::recUdpPackSucc).append(QString::number(recBuffIndex).toUtf8());
+                    curSaveFileSize += len;
+                    //字节块索引置为1
+                    fileBlocks->setBit(recBuffIndex);
+                    //qDebug() << "接收成功" << curSaveFileSize;
+                    recvProgress->setValue(((float)curSaveFileSize/saveFileSize)*100);
+                } else if(len == -1) {
+                    //接收失败带上文件块索引通知重发
+                    //msg.append(MessageType::recUdpPackFail).append(QString::number(recBuffIndex).toUtf8());
+                    qDebug() << "接收失败,通知重发";
+                }
+                //qDebug() << saveFileSize;
+                //qDebug() << curSaveFileSize;
+                if(curSaveFileSize == saveFileSize){
+                    //msg.clear();
+                    //msg.append(MessageType::sentFile);
+                    //udpSocketFile->write(msg,QHostAddress(remoteIPv4Addr),remotePort);
+                    curSaveFileSize = saveFileSize = 0;
+                    receiveFileHandle.close();
+                    recvProgress->close();
 
-
-                    //qDebug() << saveFileSize;
-                    //qDebug() << curSaveFileSize;
-                    if(curSaveFileSize == saveFileSize){
-                        msg.clear();
-                        msg.append(MessageType::sentFile);
-                        //udpSocketFile->write(msg,QHostAddress(remoteIPv4Addr),remotePort);
-                        curSaveFileSize = saveFileSize = 0;
-                        receiveFileHandle.close();
-                        recvProgress->close();
-
-                        fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
-                        quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
-                        qDebug() << fileEndTransTime;
-                        qDebug() << fileStartTransTime;
-                        //QString message = QString("文件已接收完成,耗时%1秒").arg(transNeedTime);
-                        //提示框是阻塞的 要放在最后面
-                        QMessageBox::information(this, tr("成功"),QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
-                    } else {
-                        //udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
-                    }
+                    fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+                    quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
+                    qDebug() << fileEndTransTime;
+                    qDebug() << fileStartTransTime;
+                    //QString message = QString("文件已接收完成,耗时%1秒").arg(transNeedTime);
+                    //提示框是阻塞的 要放在最后面
+                    QMessageBox::information(this, tr("成功"),QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
+                } else {
+                    //udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
                 }
             }
+
         } else if(MessageType::rejectFile == first){
 
         } else if(MessageType::sentFile == first){
