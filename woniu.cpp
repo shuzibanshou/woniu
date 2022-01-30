@@ -449,14 +449,14 @@ void woniu::onNewConnection()
 
 void woniu::onServerReadyRead(){
     QByteArray receiveBytes = tcpSocketFileClientList->readAll();
-    ///qDebug() << receiveBytes;
+    qDebug() << receiveBytes;
     parseFileMessage(receiveBytes);
 }
 
 void woniu::onClientReadyRead()
 {
     QByteArray receiveBytes = tcpSocketFileClient->readAll();
-    ///qDebug() << receiveBytes;
+    qDebug() << receiveBytes;
     parseFileMessage(receiveBytes);
 }
 
