@@ -449,7 +449,7 @@ void woniu::onNewConnection()
 
 void woniu::onServerReadyRead(){
     QByteArray receiveBytes = tcpSocketFileClientList->readAll();
-    qDebug() << receiveBytes;
+    //qDebug() << receiveBytes;
     parseFileMessage(receiveBytes);
 }
 
@@ -503,7 +503,8 @@ void woniu::parseFileMessage(QByteArray data)
                 char buff[4096] = {0};
                 blockLen = file.read(buff,sizeof(buff));
                 if(blockLen > 0){
-                    blockLen = tcpSocketFileClient->write(buff,sizeof(buff));
+                    QByteArray steam(buff);
+                    blockLen = tcpSocketFileClient->write(steam.append(MessageType::fileContent),blockLen);
                     if(blockLen > 0){
                         fileSentSize += blockLen;
                         sendProgress->setValue(((float)fileSentSize/fileSize)*100);
@@ -519,7 +520,7 @@ void woniu::parseFileMessage(QByteArray data)
 
         } else if(MessageType::fileContent == first){
             //接收文件内容
-            //qDebug() << content;
+            qDebug() << content;
             if(content.length() > 0){
                 qint64 len = 0;
                 len = receiveFileHandle.write(content);
@@ -530,8 +531,8 @@ void woniu::parseFileMessage(QByteArray data)
                     //qDebug() << "接收成功" << curSaveFileSize;
                     recvProgress->setValue(((float)curSaveFileSize/saveFileSize)*100);
                 }
-                //qDebug() << saveFileSize;
-                //qDebug() << curSaveFileSize;
+                qDebug() << saveFileSize;
+                qDebug() << curSaveFileSize;
                 if(curSaveFileSize == saveFileSize){
                     curSaveFileSize = saveFileSize = 0;
                     receiveFileHandle.close();
