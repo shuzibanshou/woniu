@@ -48,6 +48,7 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 
     //新连接
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
+    connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onClientReadyRead()));
 
     //收发文件信号槽
 //    QMap<QString, QTcpSocket*>::iterator tcpClientIter = tcpSocketFileClientList.begin();
@@ -443,7 +444,6 @@ void woniu::onNewConnection()
 
     tcpSocketFileClientList = tcpSocketFileServer->nextPendingConnection();
     connect(tcpSocketFileClientList,SIGNAL(readyRead()),this,SLOT(onServerReadyRead()));
-    connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onClientReadyRead()));
 }
 
 
