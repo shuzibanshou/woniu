@@ -495,6 +495,7 @@ void woniu::parseFileMessage(QByteArray data)
                     blockLen = tcpSocketFileClient->write(buff,sizeof(buff));
                     if(blockLen > 0){
                         fileSentSize += blockLen;
+                        sendProgress->setValue(((float)fileSentSize/fileSize)*100);
                     }
                 }
             } while(blockLen > 0);
@@ -526,8 +527,6 @@ void woniu::parseFileMessage(QByteArray data)
                     //接收成功
                     //msg.append(MessageType::recUdpPackSucc).append(QString::number(recBuffIndex).toUtf8());
                     curSaveFileSize += len;
-                    //字节块索引置为1
-                    fileBlocks->setBit(recBuffIndex);
                     //qDebug() << "接收成功" << curSaveFileSize;
                     recvProgress->setValue(((float)curSaveFileSize/saveFileSize)*100);
                 } else if(len == -1) {
@@ -549,9 +548,8 @@ void woniu::parseFileMessage(QByteArray data)
                     quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
                     qDebug() << fileEndTransTime;
                     qDebug() << fileStartTransTime;
-                    //QString message = QString("文件已接收完成,耗时%1秒").arg(transNeedTime);
                     //提示框是阻塞的 要放在最后面
-                    QMessageBox::information(this, tr("成功"),QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
+                    QMessageBox::information(this, "成功",QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
                 } else {
                     //udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
                 }
@@ -625,14 +623,14 @@ void woniu::acceptFile()
     if(succ){
         QByteArray msg;
         msg.append(MessageType::acceptFile);
-        //udpSocketFile->writeDatagram(msg,QHostAddress(remoteIPv4Addr),remotePort);
+        tcpSocketFileClientList->write(msg);
         quint64 blocksCount = qCeil((float)saveFileSize / sendUnit);    //必须要先转float才行
-        fileBlocks = new QBitArray(blocksCount);
         //时间埋点
         fileStartTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
         //显示接收文件进度条
         recvProgress = new progress(this);
         recvProgress->setRange(0,100);
+        recvProgress->setValue(0);
         recvProgress->show();
     } else {
         QMessageBox::warning(this, tr("提示"),tr("打开文件句柄失败,无法保存文件"),QMessageBox::Ok,QMessageBox::Ok);
