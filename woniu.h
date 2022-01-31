@@ -111,8 +111,6 @@ private:
     quint16 unactiveTimeout = 8;                                    //非活跃设备超时时间 默认 8秒
     QTimer*  broadcastTimer;                                        //局域网UDP循环广播定时器
     QTimer*  scanDevicesTimer;                                      //扫描活跃设备定时器
-    //QTimer*  retransMissionTimer;                                   //UDP数据包重发定时器
-    //quint16 retransMissionInterval = 200;                           //UDP数据包重发定时器时间间隔
 
     QMap<QString,deviceItem> lanDevices;                            //局域网内设备IPv4地址合集-定时扫描踢出下线设备
     QMap<QString,deviceItem> newLanDevices;                         //下一次扫描新的局域网内设备IPv4地址合集 比对旧的数据 分别新增或更新widgetItem
