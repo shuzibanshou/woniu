@@ -503,7 +503,7 @@ void woniu::parseFileMessage(QByteArray data)
                 QByteArray buff = file.read(sendUnit);
                 unitBytes = buff.length();
                 if(unitBytes > 0){
-                    unitBytes = tcpSocketFileClient->write(buff);
+                    unitBytes = tcpSocketFileClient->write(buff.insert(0,MessageType::fileContent));
                     if(unitBytes > 0){
                         fileSentSize += unitBytes;
                         sendProgress->setValue(((float)fileSentSize/fileSize)*100);
