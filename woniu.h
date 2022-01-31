@@ -79,12 +79,12 @@ private:
 
     quint16 remotePort;                                             //当前与其进行文件收发通信的远端UDP端口 默认等于filePort
     QString remoteIPv4Addr;                                         //当前与其进行文件收发通信的远端IPv4地址
+
     QFile file;                                                     //发送文件对象
     QString fileName = "";                                          //当前发送文件名
     quint64 fileSize = 0;                                           //当前发送文件总大小 bytes
-    QByteArray sendingBuff;                                         //当前正在发送的字节块
-    quint64 sendingBuffIndex = 0;                                   //当前正在发送的字节块在fileBlocks数组中的索引值
     quint64 fileSentSize = 0;                                       //当前已发送的总字节数 bytes
+    quint8 preparedSend = 0;                                        //是否准备发送文件内容 0 未准备 1 已收到接收端反馈 准备发送
 
     //bool sendLock = true;                                           //当前发送UDP包的锁 当锁为true可发送 false则不可发送
 
@@ -94,7 +94,8 @@ private:
     QString saveFilePath;                                           //当前接收文件存储路径
     quint64 saveFileSize;                                           //当前接收文件的总大小 bytes 等同于fileSize
     quint64 curSaveFileSize = 0;                                    //当前接收文件已接收总字节数
-    QBitArray* fileBlocks = nullptr;                                //当前接收文件分块的发送情况 每成功接收一块则bit位 置为1
+    quint8 receivedFileInfo = 0;                                    //是否接收到文件基本信息 0 未接收 1 已接收准备接收文件内容
+
 
     QString protocolName(QAbstractSocket::NetworkLayerProtocol);    //协议族名称转换
     QMap<QString,QString> getHostIP();                              //获取本地所有IPv4地址
@@ -122,7 +123,8 @@ private:
     void itemClicked(QListWidgetItem *);
     void itemDoubleClicked(QListWidgetItem *);
     void itemPressed(QListWidgetItem *);
-    void parseFileMessage(QByteArray);
+    void parseServerMessage(QByteArray);
+    void parseClientMessage(QByteArray);
 
 private slots:
     void onSocketStateChanged(QAbstractSocket::SocketState);
