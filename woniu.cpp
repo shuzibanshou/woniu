@@ -449,14 +449,14 @@ void woniu::onNewConnection()
 
 void woniu::onServerReadyRead(){
     QByteArray receiveBytes = tcpSocketFileClientList->readAll();
-    qDebug() << receiveBytes;
+    //qDebug() << receiveBytes;
     parseServerMessage(receiveBytes);
 }
 
 void woniu::onClientReadyRead()
 {
     QByteArray receiveBytes = tcpSocketFileClient->readAll();
-    qDebug() << receiveBytes;
+    //qDebug() << receiveBytes;
     parseClientMessage(receiveBytes);
 }
 
@@ -493,10 +493,10 @@ void woniu::parseServerMessage(QByteArray data)
                 //qDebug() << "接收成功" << curSaveFileSize;
                 recvProgress->setValue(((float)curSaveFileSize/saveFileSize)*100);
             }
-            qDebug() << saveFileSize;
-            qDebug() << curSaveFileSize;
+            //qDebug() << saveFileSize;
+            //qDebug() << curSaveFileSize;
             if(curSaveFileSize == saveFileSize){
-                curSaveFileSize = saveFileSize = 0;
+                curSaveFileSize = saveFileSize = receivedFileInfo = 0;
                 receiveFileHandle.close();
                 recvProgress->close();
 
