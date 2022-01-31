@@ -497,20 +497,19 @@ void woniu::parseFileMessage(QByteArray data)
 
             //qDebug() << "接收方已同意,开始分块并发送文件";
             fileSentSize = 0;
-            qint64 blockLen = 0;
+            qint64 sendUnit = 4096;
+            quint64 unitBytes = 0;      //每次实际发送字节数
             do {
-                blockLen = 0;
-                char buff[4096] = {0};
-                blockLen = file.read(buff,sizeof(buff));
-                if(blockLen > 0){
-                    QByteArray steam(buff);
-                    blockLen = tcpSocketFileClient->write(steam.append(MessageType::fileContent),blockLen);
-                    if(blockLen > 0){
-                        fileSentSize += blockLen;
+                QByteArray buff = file.read(sendUnit);
+                unitBytes = buff.length();
+                if(unitBytes > 0){
+                    unitBytes = tcpSocketFileClient->write(buff);
+                    if(unitBytes > 0){
+                        fileSentSize += unitBytes;
                         sendProgress->setValue(((float)fileSentSize/fileSize)*100);
                     }
                 }
-            } while(blockLen > 0);
+            } while(unitBytes > 0);
 
             //qDebug() << "1文件已发送" << fileSentSize;
             if(fileSentSize == fileSize){
