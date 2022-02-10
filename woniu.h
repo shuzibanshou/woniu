@@ -93,8 +93,8 @@ private:
     QString saveFileName;                                           //当前接收文件名
     QString saveDirPath;                                            //当前接收文件存储目录
     QString saveFilePath;                                           //当前接收文件存储路径
-    quint64 saveFileSize;                                           //当前接收文件的总大小 bytes 等同于fileSize
-    quint64 curSaveFileSize = 0;                                    //当前接收文件已接收总字节数
+    quint64 saveFileSize = 0;                                       //当前接收多文件的总大小 bytes 等同于fileSize
+    quint64 curSaveFileSize = 0;                                    //当前接收多文件已接收总字节数
     quint8 receivedFileInfo = 0;                                    //是否接收到文件基本信息 0 未接收 1 已接收准备接收文件内容
 
 
