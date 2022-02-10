@@ -400,30 +400,56 @@ void woniu:: delWidgetItem(QString key){
 void woniu:: openFile(){
     QObject* o = sender();
     QString ip = o->property("ip").toString();
-    QString filePath = QFileDialog::getOpenFileName(this,"open","../");  //选择文件
-    //QString srcDirPath = QFileDialog::getExistingDirectory(this, "choose src Directory","/");
+    //QString filePath = QFileDialog::getOpenFileName(this,"open","../");  //选择文件
     //qDebug() << filePath;
+//    if(!filePath.isEmpty()){
+//        QFileInfo info(filePath);
+//        fileName = info.fileName();
+//        fileSize = info.size();
 
-    if(!filePath.isEmpty()){
-        QFileInfo info(filePath);
-        fileName = info.fileName();
-        fileSize = info.size();
+//        //只读方式打开 file文件对象在私有成员变量中定义
+//        file.setFileName(filePath);
+//        bool succ = file.open(QIODevice::ReadOnly);
+//        if(succ){
+//            //连接文件接收方的服务器并向其发送文件信息
+//            tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+//            QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
+//            qint32 block = tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
+//            qDebug() << "连接成功，发送字节数"+QString::number(block);
+//        } else {
+//            qDebug() << "打开文件失败";
+//        }
+//    } else {
+//        qDebug() << "文件路径有误";
+//    }
 
-        //只读方式打开 file文件对象在私有成员变量中定义
-        file.setFileName(filePath);
-        bool succ = file.open(QIODevice::ReadOnly);
-        if(succ){
-            //连接文件接收方的服务器并向其发送文件信息
-            tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
-            QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
-            qint32 block = tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
-            qDebug() << "连接成功，发送字节数"+QString::number(block);
-        } else {
-            qDebug() << "打开文件失败";
+    QStringList filePaths = QFileDialog::getOpenFileNames(this,"open","../");  //选择多文件
+    QStringList temp;
+    foreach(auto filePath,filePaths){
+        if(!filePath.isEmpty()){
+            //判断文件是否可读
+            QFile* _file = new QFile(filePath);
+            if(_file->open(QIODevice::ReadOnly)){
+                files.append(_file);
+
+                QFileInfo info(filePath);
+                fileName = info.fileName();
+                fileSize = info.size();
+                QString fi = QString("%1##%2").arg(fileName).arg(fileSize);
+                temp.append(fi);
+            } else {
+                QMessageBox::critical(this, tr("错误"),tr("文件无法打开"),QMessageBox::Ok,QMessageBox::Ok);
+                return;
+            }
         }
-    } else {
-        qDebug() << "文件路径有误";
     }
+    QString res = temp.join("||");
+    tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+    tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
+    qDebug() << res;
+
+    //TODO
+    //QString srcDirPath = QFileDialog::getExistingDirectory(this, "choose src Directory","/"); //选择文件夹
 }
 
 /**
@@ -462,16 +488,35 @@ void woniu::onClientReadyRead()
     parseClientMessage(receiveBytes);
 }
 
+/**
+ * 解析“文件发送方”发送的消息
+ * @brief woniu::parseServerMessage
+ * @param data
+ */
 void woniu::parseServerMessage(QByteArray data)
 {
     if(receivedFileInfo == 0){
         receivedFileInfo = 1;
 
         QString receiveData = QString::fromUtf8(data);
-        //弹出模态对话框
-        QString fileName = receiveData.split("##")[0];
-        QString fileSize = receiveData.split("##")[1];
-        saveFileSize = fileSize.toUInt();
+        QStringList list = receiveData.split("||");
+        QString fileSize;
+
+        if(list.count() > 1){
+            QString fileName = list.at(0).split("##")[0]+"等"+QString::number(list.count())+"个文件";
+            foreach(auto v,list){
+                saveFileSize += v.split("##")[1].toUInt();
+            }
+            fileSize = QString::number(saveFileSize);
+        } else if(list.count() == 1){
+            QString fileName = list.at(0).split("##")[0];
+            fileSize = receiveData.split("##")[1];
+            saveFileSize = fileSize.toUInt();
+        }  else {
+            qDebug() << "未收到任何文件消息";
+        }
+
+        //实例化非模态对话框
         receiveFile* rFile = new receiveFile(this);
         rFile->setIPv4(remoteIPv4Addr);
         rFile->setFileName(fileName);
@@ -515,7 +560,7 @@ void woniu::parseServerMessage(QByteArray data)
 
 
 /**
- * 接收远程主机发送的文件消息
+ * 解析“文件接收方”发送的消息
  * @brief woniu::parseMessage
  */
 void woniu::parseClientMessage(QByteArray data)
