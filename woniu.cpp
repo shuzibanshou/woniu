@@ -576,15 +576,15 @@ void woniu::getSysIcon()
     if(osType == "macos"){
         ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/macos.png"));
     } else if(osType == "ios"){
-        ui->sysIcon->setPixmap(QPixmap("qrc:/sysIcon/icons/iphone.png"));
+        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/iphone.png"));
     } else if(osType == "ubuntu" || osType == "centos" || osType == "redhat" || osType == "debian" || osType == "suse" || osType == "android"){
-        ui->sysIcon->setPixmap(QPixmap("qrc:/sysIcon/icons/"+osType+".png"));
+        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/"+osType+".png"));
     } else if(osType == "windows"){
         QList<QString> ver = osVersion.split(".");
         QString bigVer = ver.at(0);
-        ui->sysIcon->setPixmap(QPixmap("qrc:/sysIcon/icons/windows-"+bigVer+".png"));
+        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/windows-"+bigVer+".png"));
     } else {
-         ui->sysIcon->setPixmap(QPixmap("qrc:/sysIcon/icons/linux.png"));
+         ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/linux.png"));
     }
     //qDebug() << osVersion;
 }
