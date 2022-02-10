@@ -31,16 +31,7 @@
       <number>10</number>
      </property>
      <item>
-      <widget class="QGraphicsView" name="graphicsView">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+      <widget class="QLabel" name="sysIcon">
        <property name="minimumSize">
         <size>
          <width>50</width>
@@ -52,6 +43,9 @@
          <width>50</width>
          <height>50</height>
         </size>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

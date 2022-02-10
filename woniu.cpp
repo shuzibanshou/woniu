@@ -139,6 +139,7 @@ QString woniu::getDeviceInfo()
 {
     QString localHost = QHostInfo::localHostName();
     QString os = QSysInfo::prettyProductName();
+    qDebug() << os;
     //deviceInfo dev = {.deviceOS = os,.deviceName = localHost};
     return os+"##"+localHost;
 }
@@ -399,10 +400,11 @@ void woniu:: delWidgetItem(QString key){
 void woniu:: openFile(){
     QObject* o = sender();
     QString ip = o->property("ip").toString();
-    QString filePath = QFileDialog::getOpenFileName(this,"open","../");
+    QString filePath = QFileDialog::getOpenFileName(this,"open","../");  //选择文件
+    //QString srcDirPath = QFileDialog::getExistingDirectory(this, "choose src Directory","/");
+    //qDebug() << filePath;
+
     if(!filePath.isEmpty()){
-        //QString fileName = "";
-        //quint32 fileSize = 0;
         QFileInfo info(filePath);
         fileName = info.fileName();
         fileSize = info.size();
