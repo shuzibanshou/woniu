@@ -123,6 +123,7 @@ private:
     void itemPressed(QListWidgetItem *);
     void parseServerMessage(QByteArray);
     void parseClientMessage(QByteArray);
+    void getSysIcon();                                              //设置系统icon
 
 private slots:
     void onSocketStateChanged(QAbstractSocket::SocketState);

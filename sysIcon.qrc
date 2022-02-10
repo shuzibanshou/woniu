@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/sysIcon">
+        <file>icons/android.png</file>
+        <file>icons/centos.png</file>
+        <file>icons/debian.png</file>
+        <file>icons/iphone.png</file>
+        <file>icons/linux.png</file>
+        <file>icons/macos.png</file>
+        <file>icons/redhat.png</file>
+        <file>icons/suse.png</file>
+        <file>icons/ubuntu.png</file>
+        <file>icons/windows-10.png</file>
+        <file>icons/windows-xp.png</file>
+        <file>icons/windows-8.png</file>
+    </qresource>
+</RCC>
