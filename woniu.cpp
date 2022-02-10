@@ -508,6 +508,7 @@ void woniu::parseServerMessage(QByteArray data)
                 saveFileSize += v.split("##")[1].toUInt();
             }
             fileSize = QString::number(saveFileSize);
+            qDebug() << fileSize;
         } else if(list.count() == 1){
             fileName = list.at(0).split("##")[0];
             fileSize = receiveData.split("##")[1];
