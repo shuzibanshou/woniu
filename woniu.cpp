@@ -500,16 +500,16 @@ void woniu::parseServerMessage(QByteArray data)
 
         QString receiveData = QString::fromUtf8(data);
         QStringList list = receiveData.split("||");
-        QString fileSize;
+        QString fileSize,fileName;
 
         if(list.count() > 1){
-            QString fileName = list.at(0).split("##")[0]+"等"+QString::number(list.count())+"个文件";
+            fileName = list.at(0).split("##")[0]+"等"+QString::number(list.count())+"个文件";
             foreach(auto v,list){
                 saveFileSize += v.split("##")[1].toUInt();
             }
             fileSize = QString::number(saveFileSize);
         } else if(list.count() == 1){
-            QString fileName = list.at(0).split("##")[0];
+            fileName = list.at(0).split("##")[0];
             fileSize = receiveData.split("##")[1];
             saveFileSize = fileSize.toUInt();
         }  else {
