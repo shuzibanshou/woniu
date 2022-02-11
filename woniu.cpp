@@ -317,9 +317,14 @@ void woniu:: addWidgetItem(QString key,deviceItem di){
     font1.setPointSize(12);
     deviceName->setFont(font1);
     deviceName->setAlignment(Qt::AlignCenter);
-    //deviceName->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-    //deviceName->setMargin(10);
     deviceName->setText(di.deviceName);
+    deviceName->setMinimumWidth(80);
+    deviceName->setMaximumWidth(80);
+    //文本在label溢出则显示...
+    QString text(di.deviceName);
+    QFontMetrics metrics(deviceName->font());
+    QString elidedText = metrics.elidedText(text, Qt::ElideRight, deviceName->width());
+    deviceName->setText(elidedText);
 
     QLabel *deviceIPv4 = new QLabel(itemWidget);
     deviceName->setObjectName(QStringLiteral("deviceIPv4"));
@@ -329,6 +334,8 @@ void woniu:: addWidgetItem(QString key,deviceItem di){
     deviceIPv4->setFont(font2);
     deviceName->setAlignment(Qt::AlignCenter);
     deviceIPv4->setText(di.deviceIPv4);
+    deviceIPv4->setMinimumWidth(100);
+    deviceIPv4->setMaximumWidth(100);
 
     QPushButton *sendFile = new QPushButton(itemWidget);
     sendFile->setObjectName(QStringLiteral("sendFile"));
