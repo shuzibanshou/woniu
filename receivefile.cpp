@@ -89,7 +89,7 @@ void receiveFile::on_pushButton_2_clicked()
 
 /**
  * 拒收新文件
- * @brief receiveFile::on_pushButton_2_clicked
+ * @brief receiveFile::on_pushButton_3_clicked
  */
 void receiveFile::on_pushButton_3_clicked()
 {

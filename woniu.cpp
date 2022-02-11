@@ -506,6 +506,7 @@ void woniu::parseServerMessage(QByteArray data)
             fileName = list.at(0).split("##")[0]+"等"+QString::number(list.count())+"个文件";
             foreach(auto v,list){
                 saveFileSize += v.split("##")[1].toUInt();
+
             }
             fileSize = QString::number(saveFileSize);
             qDebug() << fileSize;
