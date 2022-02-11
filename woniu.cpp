@@ -47,8 +47,9 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     connect(scanDevicesTimer,SIGNAL(timeout()),this,SLOT(scanDevices()));
     //connect(retransMissionTimer,SIGNAL(timeout()),this,SLOT(retransMissionPacket()));
 
-    //新连接
+    //有新连接到达服务端
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
+    //客户端准备读取数据（消息数据，非文件内容）
     connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onClientReadyRead()));
 
     //收发文件信号槽
@@ -444,9 +445,10 @@ void woniu:: openFile(){
                 files.append(_file);
 
                 QFileInfo info(filePath);
-                fileName = info.fileName();
-                fileSize = info.size();
-                QString fi = QString("%1##%2").arg(fileName).arg(fileSize);
+                QString singleFileName = info.fileName();
+                quint64 singleFileSize = info.size();
+                fileSize += singleFileSize;
+                QString fi = QString("%1##%2").arg(singleFileName).arg(singleFileSize);
                 temp.append(fi);
             } else {
                 QMessageBox::critical(this, tr("错误"),tr("文件无法打开"),QMessageBox::Ok,QMessageBox::Ok);
@@ -510,19 +512,18 @@ void woniu::parseServerMessage(QByteArray data)
         receivedFileInfo = 1;
 
         QString receiveData = QString::fromUtf8(data);
-        QStringList list = receiveData.split("||");
+        receiveFiles = receiveData.split("||");
         QString fileSize,fileName;
 
-        if(list.count() > 1){
-            fileName = list.at(0).split("##")[0]+"等"+QString::number(list.count())+"个文件";
-            foreach(auto v,list){
+        if(receiveFiles.count() > 1){
+            fileName = receiveFiles.at(0).split("##")[0]+"等"+QString::number(receiveFiles.count())+"个文件";
+            foreach(auto v,receiveFiles){
                 saveFileSize += v.split("##")[1].toUInt();
-
             }
             fileSize = QString::number(saveFileSize);
             qDebug() << fileSize;
-        } else if(list.count() == 1){
-            fileName = list.at(0).split("##")[0];
+        } else if(receiveFiles.count() == 1){
+            fileName = receiveFiles.at(0).split("##")[0];
             fileSize = receiveData.split("##")[1];
             saveFileSize = fileSize.toUInt();
         }  else {
@@ -534,7 +535,8 @@ void woniu::parseServerMessage(QByteArray data)
         rFile->setIPv4(remoteIPv4Addr);
         rFile->setFileName(fileName);
         rFile->setFileSize(fileSize);
-        saveFileName = fileName;
+
+        saveFileName = receiveFiles.at(curReceiveFileIndex).split("##")[0];
         saveDirPath = QCoreApplication::applicationDirPath() + "/receiveFiles";
         rFile->setSaveFilePath(saveDirPath);
         saveFilePath = saveDirPath + "/" + saveFileName;
@@ -550,27 +552,46 @@ void woniu::parseServerMessage(QByteArray data)
             if(len > 0){
                 //接收成功
                 curSaveFileSize += len;
+                curSaveFileTotalSize += len;
                 //qDebug() << "接收成功" << curSaveFileSize;
-                recvProgress->setValue(((float)curSaveFileSize/saveFileSize)*100);
+                recvProgress->setValue(((float)curSaveFileTotalSize/saveFileSize)*100);
             }
+            //单个文件传输完成
+            if(curSaveFileSize == receiveFiles.at(curReceiveFileIndex).split("##")[1].toULongLong()){
+                curSaveFileSize = 0;
+                receiveFileHandle.close();
+                //发送一个文件接收完毕消息给文件发送方
+                if((curReceiveFileIndex + 1) < receiveFiles.length()){
+                    ++curReceiveFileIndex;
+                    receiveFileHandle.setFileName(receiveFiles.at(curReceiveFileIndex).split("##")[0]);
+                    receiveFileHandle.open(QIODevice::WriteOnly);
+                }
+                tcpSocketFileClientList->write(QByteArray().append(MessageType::receiveSingleFile));
+                //所有文件都传输完成
+                if((curReceiveFileIndex + 1) >= receiveFiles.length()){
+                    receivedFileInfo = 0;
+                    fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+                    quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
+                    //提示框是阻塞的 要放在最后面
+                    QMessageBox::information(this, "成功",QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
+                }
+            }
+
             //qDebug() << saveFileSize;
             //qDebug() << curSaveFileSize;
-            if(curSaveFileSize == saveFileSize){
-                curSaveFileSize = saveFileSize = receivedFileInfo = 0;
-                receiveFileHandle.close();
-                recvProgress->close();
+//            if(curSaveFileSize == saveFileSize){
+//                curSaveFileSize = saveFileSize = receivedFileInfo = 0;
+//                receiveFileHandle.close();
+//                recvProgress->close();
 
-                fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
-                quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
-                //提示框是阻塞的 要放在最后面
-                QMessageBox::information(this, "成功",QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
-            }
+//                fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+//                quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
+//                //提示框是阻塞的 要放在最后面
+//                QMessageBox::information(this, "成功",QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
+//            }
         }
     }
 }
-
-
-
 
 /**
  * 解析“文件接收方”发送的消息
@@ -578,7 +599,7 @@ void woniu::parseServerMessage(QByteArray data)
  */
 void woniu::parseClientMessage(QByteArray data)
 {
-    if(preparedSend == 0){
+    //if(preparedSend == 0){
         int first = data[0];            //第一个字节
         QByteArray content;
         content.append(data.data() + 1, data.size() - 1);   //去掉data字节流的第一个字节
@@ -590,37 +611,62 @@ void woniu::parseClientMessage(QByteArray data)
             sendProgress->setRange(0,100);
             sendProgress->show();
 
-            //qDebug() << "接收方已同意,开始分块并发送文件";
-            fileSentSize = 0;
-            qint64 sendUnit = 4096;
-            quint64 unitBytes = 0;      //每次实际发送字节数
-            do {
-                QByteArray buff = file.read(sendUnit);
-                unitBytes = buff.length();
-                if(unitBytes > 0){
-                    unitBytes = tcpSocketFileClient->write(buff);
-                    if(unitBytes > 0){
-                        fileSentSize += unitBytes;
-                        sendProgress->setValue(((float)fileSentSize/fileSize)*100);
-                    }
-                }
-            } while(unitBytes > 0);
-
-            //qDebug() << "1文件已发送" << fileSentSize;
-            if(fileSentSize == fileSize){
+            //qDebug() << "接收方已同意,开始分块并发送多个文件";
+            sendFile(curFileIndex);
+//            if(fileSentSize == fileSize){
+//                qDebug() << "文件发送完毕";
+//                //文件发送完毕 清空变量 进行清扫工作
+//                fileSentSize = preparedSend = fileSize = 0;
+//                sendProgress->close();
+//                foreach(auto pFile,files){
+//                    pFile->close();
+//                }
+//            }
+        } else if(MessageType::rejectFile == first){
+            //拒绝接收文件
+        } else if(MessageType::receiveSingleFile == first){
+            //某个文件已接收完毕 curFileIndex++ 传输下一个文件 如果还有未传输的文件
+            if((curFileIndex + 1) < files.length() ){
+                ++curFileIndex;
+                sendFile(curFileIndex);
+            } else {
                 qDebug() << "文件发送完毕";
                 //文件发送完毕 清空变量 进行清扫工作
-                fileName = "";
                 fileSentSize = preparedSend = fileSize = 0;
                 sendProgress->close();
-                file.close();
+                foreach(auto pFile,files){
+                    if(pFile->isOpen()){
+                        pFile->close();
+                    }
+                }
             }
-        } else if(MessageType::rejectFile == first){
 
         }
-    } else {
+//    } else {
 
-    }
+//    }
+}
+
+/**
+ * 单个文件发送函数
+ * @brief woniu::sendFile
+ * @param index
+ */
+void woniu::sendFile(quint64 index)
+{
+    qint64 sendUnit = 4096;
+    quint64 unitBytes = 0;      //每次实际发送字节数
+    do {
+        QByteArray buff = files.at(index)->read(sendUnit);
+        unitBytes = buff.length();
+        if(unitBytes > 0){
+            unitBytes = tcpSocketFileClient->write(buff);
+            if(unitBytes > 0){
+                fileSentSize += unitBytes;
+                sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+            }
+        }
+    } while(unitBytes > 0);
 }
 
 /**
@@ -646,6 +692,7 @@ void woniu::getSysIcon()
     }
     //qDebug() << osVersion;
 }
+
 
 
 /**

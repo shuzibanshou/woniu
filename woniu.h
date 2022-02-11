@@ -37,7 +37,8 @@ enum MessageType{
     rejectFile = 0x4,               //拒绝接收该文件
     sentFile = 0x5,                 //文件发送完毕
     recUdpPackSucc = 0x06,          //UDP包接收成功反馈通知
-    recUdpPackFail = 0x07           //UDP包接收失败反馈通知
+    recUdpPackFail = 0x07,           //UDP包接收失败反馈通知
+    receiveSingleFile = 0x08,       //单个文件接收完毕
 };
 
 //定义设备信息结构体
@@ -80,21 +81,23 @@ private:
     quint16 remotePort;                                             //当前与其进行文件收发通信的远端UDP端口 默认等于filePort
     QString remoteIPv4Addr;                                         //当前与其进行文件收发通信的远端IPv4地址
 
-    QFile file;
-    QList<QFile*> files;                                             //发送文件对象
+    //QFile file;
+    QList<QFile*> files;                                            //发送多文件对象序列
     QString fileName = "";                                          //当前发送文件名
-    quint64 fileSize = 0;                                           //当前发送文件总大小 bytes
+    quint64 fileSize = 0;                                           //当前发送多文件总大小 bytes
     quint64 fileSentSize = 0;                                       //当前已发送的总字节数 bytes
+    qint64 curFileIndex = 0;                                        //当前发送的文件在多文件对象序列的索引位置
     quint8 preparedSend = 0;                                        //是否准备发送文件内容 0 未准备 1 已收到接收端反馈 准备发送
 
-    //bool sendLock = true;                                           //当前发送UDP包的锁 当锁为true可发送 false则不可发送
-
+    QStringList receiveFiles;                                       //接收多文件的信息序列
     QFile receiveFileHandle;                                        //接收文件对象
     QString saveFileName;                                           //当前接收文件名
     QString saveDirPath;                                            //当前接收文件存储目录
     QString saveFilePath;                                           //当前接收文件存储路径
     quint64 saveFileSize = 0;                                       //当前接收多文件的总大小 bytes 等同于fileSize
-    quint64 curSaveFileSize = 0;                                    //当前接收多文件已接收总字节数
+    quint64 curSaveFileSize = 0;                                    //当前接收多文件中单个文件已接收总字节数
+    quint64 curSaveFileTotalSize = 0;                               //当前接收多文件中所有文件已接收总字节数
+    qint64 curReceiveFileIndex = 0;                                 //当前接收的文件在多文件信息序列的索引位置
     quint8 receivedFileInfo = 0;                                    //是否接收到文件基本信息 0 未接收 1 已接收准备接收文件内容
 
 
@@ -127,6 +130,7 @@ private:
     void getSysIcon();                                              //设置系统icon
 
 private slots:
+    void sendFile(quint64);                                         //传输文件底层函数
     void onSocketStateChanged(QAbstractSocket::SocketState);
     void onSocketReadyRead();
     void lanBroadcast();                                            //程序启动时进行局域网广播
