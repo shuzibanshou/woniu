@@ -219,6 +219,7 @@ void woniu::scanDevices()
     quint32 now = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
     QMap<QString, deviceItem>::iterator iter = newLanDevices.begin();
 
+    //addWidgetIte
     while (iter != newLanDevices.end())
     {
 
@@ -234,7 +235,10 @@ void woniu::scanDevices()
                     updateWidgetItem(iter.key(),iter.value());
                 }
             } else {
-                addWidgetItem(iter.key(),iter.value());  
+                //qDebug() << iter.key();
+                //deviceItem test = {.deviceOS = "linux",.deviceName="localhost-12locanho",.deviceIPv4="192.168.1.122",.item = nullptr,.timestamp=121231};
+                addWidgetItem(iter.key(),iter.value());
+                //addWidgetItem(iter.key(),test);
             }
             iter++;
         }
@@ -312,8 +316,8 @@ void woniu:: addWidgetItem(QString key,deviceItem di){
     font1.setFamily(QStringLiteral("Arial"));
     font1.setPointSize(12);
     deviceName->setFont(font1);
-    //deviceName->setAlignment(Qt::AlignCenter);
-    deviceName->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    deviceName->setAlignment(Qt::AlignCenter);
+    //deviceName->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     //deviceName->setMargin(10);
     deviceName->setText(di.deviceName);
 
