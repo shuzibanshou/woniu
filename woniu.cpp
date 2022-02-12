@@ -569,7 +569,8 @@ void woniu::parseServerMessage(QByteArray data)
                 tcpSocketFileClientList->write(QByteArray().append(MessageType::receiveSingleFile));
                 //所有文件都传输完成
                 if((curReceiveFileIndex + 1) >= receiveFiles.length()){
-                    receivedFileInfo = 0;
+                    //接收文件标识符置为0 方便下一次文件传输
+                    curSaveFileTotalSize = receivedFileInfo = 0;
                     fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
                     quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
                     //提示框是阻塞的 要放在最后面
