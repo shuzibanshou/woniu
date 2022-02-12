@@ -571,6 +571,8 @@ void woniu::parseServerMessage(QByteArray data)
                 if((curReceiveFileIndex + 1) >= receiveFiles.length()){
                     //接收文件标识符置为0 方便下一次文件传输
                     curSaveFileTotalSize = receivedFileInfo = 0;
+                    recvProgress->close();
+
                     fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
                     quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
                     //提示框是阻塞的 要放在最后面
