@@ -563,16 +563,16 @@ void woniu::parseServerMessage(QByteArray data)
                 curSaveFileSize = 0;
                 receiveFileHandle.close();
                 //发送一个文件接收完毕消息给文件发送方
+                tcpSocketFileClientList->write(QByteArray().append(MessageType::receiveSingleFile));
                 if((curReceiveFileIndex + 1) < receiveFiles.length()){
                     ++curReceiveFileIndex;
-                    receiveFileHandle.setFileName(receiveFiles.at(curReceiveFileIndex).split("##")[0]);
+                    receiveFileHandle.setFileName(saveDirPath + "/" + receiveFiles.at(curReceiveFileIndex).split("##")[0]);
                     receiveFileHandle.open(QIODevice::WriteOnly);
-                }
-                tcpSocketFileClientList->write(QByteArray().append(MessageType::receiveSingleFile));
-                //所有文件都传输完成
-                if((curReceiveFileIndex + 1) >= receiveFiles.length()){
+                } else {
+                    //所有文件都传输完成
                     //接收文件标识符置为0 方便下一次文件传输
                     curSaveFileTotalSize = receivedFileInfo = 0;
+                    curReceiveFileIndex = 0;
                     recvProgress->close();
 
                     fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
@@ -580,6 +580,7 @@ void woniu::parseServerMessage(QByteArray data)
                     //提示框是阻塞的 要放在最后面
                     QMessageBox::information(this, "成功",QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
                 }
+
             }
 
             //qDebug() << saveFileSize;
@@ -637,7 +638,7 @@ void woniu::parseClientMessage(QByteArray data)
             } else {
                 qDebug() << "文件发送完毕";
                 //文件发送完毕 清空变量 进行清扫工作
-                fileSentSize = preparedSend = fileSize = 0;
+                fileSentSize = preparedSend = fileSize = curFileIndex = 0;
                 sendProgress->close();
                 foreach(auto pFile,files){
                     if(pFile->isOpen()){
