@@ -457,7 +457,9 @@ void woniu:: openFile(){
         }
     }
     QString res = temp.join("||");
-    tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+    if(tcpSocketFileClient->state() == QAbstractSocket::SocketState::UnconnectedState){
+        tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+    }
     tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
     qDebug() << res;
 
@@ -642,6 +644,7 @@ void woniu::parseClientMessage(QByteArray data)
                         pFile->close();
                     }
                 }
+                files.clear();
             }
 
         }

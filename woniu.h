@@ -81,7 +81,6 @@ private:
     quint16 remotePort;                                             //当前与其进行文件收发通信的远端UDP端口 默认等于filePort
     QString remoteIPv4Addr;                                         //当前与其进行文件收发通信的远端IPv4地址
 
-    //QFile file;
     QList<QFile*> files;                                            //发送多文件对象序列
     QString fileName = "";                                          //当前发送文件名
     quint64 fileSize = 0;                                           //当前发送多文件总大小 bytes
