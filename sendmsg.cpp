@@ -8,6 +8,7 @@ sendmsg::sendmsg(QWidget *parent) :
     ui(new Ui::sendmsg)
 {
     ui->setupUi(this);
+    tcpSocketMsgClient = new QTcpSocket(this);
     sentMsgLogModel = new QStringListModel(this);
 }
 
@@ -40,5 +41,6 @@ void sendmsg::on_sendMsgAction_clicked()
     QModelIndex index = sentMsgLogModel->index(sentMsgLogModel->rowCount() - 1, 0);
     sentMsgLogModel->setData(index,msgContent,Qt::DisplayRole);
     ui->sentMsgLog->setModel(sentMsgLogModel);
+    ui->msgContent->clear();
 }
 
