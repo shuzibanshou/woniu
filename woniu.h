@@ -103,7 +103,7 @@ private:
     QTcpServer* tcpSocketMsgServer;                                 //TCP收发文本消息的server socket
     QTcpSocket* tcpSocketMsgClientList;                             //TCP收发文件消息 server新连接的socket
     quint16 msgPort = 20002;                                        //TCP收发文本消息的端口
-    QStringListModel* msgModel;                                     //接收消息文本记录 listview对应的model
+    QStringListModel* receiveMsgLogModel;                                     //接收消息文本记录 listview对应的model
 
     QString protocolName(QAbstractSocket::NetworkLayerProtocol);    //协议族名称转换
     QMap<QString,QString> getHostIP();                              //获取本地所有IPv4地址

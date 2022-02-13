@@ -39,5 +39,6 @@ void sendmsg::on_sendMsgAction_clicked()
     sentMsgLogModel->insertRow(sentMsgLogModel->rowCount());
     QModelIndex index = sentMsgLogModel->index(sentMsgLogModel->rowCount() - 1, 0);
     sentMsgLogModel->setData(index,msgContent,Qt::DisplayRole);
+    ui->sentMsgLog->setModel(sentMsgLogModel);
 }
 

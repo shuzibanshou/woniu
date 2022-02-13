@@ -3,6 +3,7 @@
 
 #include "receivefile.h"
 #include "sendmsg.h"
+#include "receivemsg.h"
 #include "progress.h"
 
 #include "common.h"
@@ -51,7 +52,7 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
        qDebug("文本消息-TCP监听成功");
     }
     //初始化文本模型
-    msgModel = new QStringListModel();
+    receiveMsgLogModel = new QStringListModel();
 
     connect(udpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(onSocketStateChanged(QAbstractSocket::SocketState)));
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onSocketReadyRead()));
@@ -755,8 +756,11 @@ void woniu::rejectFile()
 void woniu::onServerReadyReadMsg(){
     QByteArray receiveBytes = tcpSocketMsgClientList->readAll();
     //qDebug() << receiveBytes;
+    receiveMsgLogModel->insertRow(receiveMsgLogModel->rowCount());              //插入新行
+    QModelIndex index = receiveMsgLogModel->index(receiveMsgLogModel->rowCount() - 1, 0);
+    receiveMsgLogModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
 
-    msgModel->insertRow(msgModel->rowCount());              //插入新行
-    QModelIndex index = msgModel->index(msgModel->rowCount() - 1, 0);
-    msgModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
+    static receiveMsg* rMsgDialog = new receiveMsg();
+    rMsgDialog->setModel(receiveMsgLogModel);
+    rMsgDialog->show();
 }
