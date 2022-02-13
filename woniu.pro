@@ -13,17 +13,20 @@ SOURCES += \
     main.cpp \
     progress.cpp \
     receivefile.cpp \
+    sendmsg.cpp \
     woniu.cpp
 
 HEADERS += \
     common.h \
     progress.h \
     receivefile.h \
+    sendmsg.h \
     woniu.h
 
 FORMS += \
     progress.ui \
     receivefile.ui \
+    sendmsg.ui \
     woniu.ui
 
 TRANSLATIONS += \

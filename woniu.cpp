@@ -2,6 +2,7 @@
 #include "ui_woniu.h"
 
 #include "receivefile.h"
+#include "sendmsg.h"
 #include "progress.h"
 
 #include "common.h"
@@ -36,11 +37,22 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
        qDebug("绑定UDP广播端口成功");
     }
     if(!tcpSocketFileServer->listen(QHostAddress::Any,filePort)){
-       qDebug("TCP监听失败,%s",qPrintable(tcpSocketFileServer->errorString()));
+       qDebug("文件传输-TCP监听失败,%s",qPrintable(tcpSocketFileServer->errorString()));
        tcpSocketFileServer->listen(QHostAddress::Any,filePort);
     } else {
-       qDebug("TCP监听成功");
+       qDebug("文件传输-TCP监听成功");
     }
+    //再次启动tcp协议用于文本消息的传输
+    tcpSocketMsgServer = new QTcpServer(this);
+    if(!tcpSocketMsgServer->listen(QHostAddress::Any,msgPort)){
+       qDebug("文本消息-TCP监听失败,%s",qPrintable(tcpSocketMsgServer->errorString()));
+       tcpSocketMsgServer->listen(QHostAddress::Any,msgPort);
+    } else {
+       qDebug("文本消息-TCP监听成功");
+    }
+    //初始化文本模型
+    msgModel = new QStringListModel();
+
     connect(udpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(onSocketStateChanged(QAbstractSocket::SocketState)));
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onSocketReadyRead()));
     connect(broadcastTimer,SIGNAL(timeout()),this,SLOT(lanBroadcast()));
@@ -49,7 +61,8 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 
     //有新连接到达服务端
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
-    //客户端准备读取数据（消息数据，非文件内容）
+    connect(tcpSocketMsgServer,SIGNAL(newConnection()),this,SLOT(onNewMsgConnection()));
+    //文件发送方准备读取数据（文件接收方发送的消息格式数据，非文件内容）
     connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onClientReadyRead()));
 
     //收发文件信号槽
@@ -461,7 +474,7 @@ void woniu:: openFile(){
         tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
     }
     tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
-    qDebug() << res;
+    //qDebug() << res;
 
     //TODO
     //QString srcDirPath = QFileDialog::getExistingDirectory(this, "choose src Directory","/"); //选择文件夹
@@ -475,7 +488,10 @@ void woniu:: openMsgDialog(){
     //qDebug() << "打开消息管理器";
     QObject* o = sender();
     QString ip = o->property("ip").toString();
-    qDebug() << ip;
+    sendmsg* smsg = new sendmsg(this);
+    smsg->setProperty("ip",ip);
+    smsg->show();
+    //qDebug() << ip;
 }
 
 void woniu::onNewConnection()
@@ -487,6 +503,12 @@ void woniu::onNewConnection()
 
     tcpSocketFileClientList = tcpSocketFileServer->nextPendingConnection();
     connect(tcpSocketFileClientList,SIGNAL(readyRead()),this,SLOT(onServerReadyRead()));
+}
+
+void woniu::onNewMsgConnection()
+{
+    tcpSocketMsgClientList = tcpSocketMsgServer->nextPendingConnection();
+    connect(tcpSocketMsgClientList,SIGNAL(readyRead()),this,SLOT(onServerReadyReadMsg()));
 }
 
 
@@ -619,15 +641,6 @@ void woniu::parseClientMessage(QByteArray data)
 
             //qDebug() << "接收方已同意,开始分块并发送多个文件";
             sendFile(curFileIndex);
-//            if(fileSentSize == fileSize){
-//                qDebug() << "文件发送完毕";
-//                //文件发送完毕 清空变量 进行清扫工作
-//                fileSentSize = preparedSend = fileSize = 0;
-//                sendProgress->close();
-//                foreach(auto pFile,files){
-//                    pFile->close();
-//                }
-//            }
         } else if(MessageType::rejectFile == first){
             //拒绝接收文件
         } else if(MessageType::receiveSingleFile == first){
@@ -736,3 +749,14 @@ void woniu::rejectFile()
     qDebug() << "拒绝接收文件";
 }
 
+//////
+//////消息传输
+//////
+void woniu::onServerReadyReadMsg(){
+    QByteArray receiveBytes = tcpSocketMsgClientList->readAll();
+    //qDebug() << receiveBytes;
+
+    msgModel->insertRow(msgModel->rowCount());              //插入新行
+    QModelIndex index = msgModel->index(msgModel->rowCount() - 1, 0);
+    msgModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
+}

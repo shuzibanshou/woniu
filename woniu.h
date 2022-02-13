@@ -22,6 +22,7 @@
 //#include <QElapsedTimer>
 #include <QtMath>
 #include <QException>
+#include <QStringListModel>
 
 #include "progress.h"
 
@@ -77,7 +78,6 @@ private:
     //QMap<QString,QTcpSocket*> tcpSocketFileClientList;              //TCP收发文件的client socket
 
     quint16 filePort = 20001;                                       //TCP收发文件的端口
-
     quint16 remotePort;                                             //当前与其进行文件收发通信的远端UDP端口 默认等于filePort
     QString remoteIPv4Addr;                                         //当前与其进行文件收发通信的远端IPv4地址
 
@@ -99,6 +99,11 @@ private:
     qint64 curReceiveFileIndex = 0;                                 //当前接收的文件在多文件信息序列的索引位置
     quint8 receivedFileInfo = 0;                                    //是否接收到文件基本信息 0 未接收 1 已接收准备接收文件内容
 
+    //文本消息相关
+    QTcpServer* tcpSocketMsgServer;                                 //TCP收发文本消息的server socket
+    QTcpSocket* tcpSocketMsgClientList;                             //TCP收发文件消息 server新连接的socket
+    quint16 msgPort = 20002;                                        //TCP收发文本消息的端口
+    QStringListModel* msgModel;                                     //接收消息文本记录 listview对应的model
 
     QString protocolName(QAbstractSocket::NetworkLayerProtocol);    //协议族名称转换
     QMap<QString,QString> getHostIP();                              //获取本地所有IPv4地址
@@ -137,8 +142,10 @@ private slots:
     void openFile();                                                //打开文件管理器
     void openMsgDialog();                                           //打开发送消息框
     void onNewConnection();
+    void onNewMsgConnection();
     void onServerReadyRead();                                       //读取socket数据的槽函数
     void onClientReadyRead();
+    void onServerReadyReadMsg();
     //void on_remoteDevice_clicked(const QModelIndex &index);
     void acceptFile();                                              //确认接收文件
     void rejectFile();                                              //拒收文件
