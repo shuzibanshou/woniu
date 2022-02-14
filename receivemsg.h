@@ -5,6 +5,19 @@
 #include <QStringListModel>
 #include <QLineEdit>
 
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListView>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
+
 namespace Ui {
 class receiveMsg;
 }
@@ -17,7 +30,7 @@ public:
     explicit receiveMsg(QWidget *parent = nullptr);
     ~receiveMsg();
     void setModel(QStringListModel*);
-    void setIndexWidget(const QModelIndex &, QWidget *);
+    void setIndexWidget(const QModelIndex &);
 private:
     Ui::receiveMsg *ui;
 };

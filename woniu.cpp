@@ -774,7 +774,7 @@ void woniu::onServerReadyReadMsg(){
     deviceName->setMaximumWidth(80);
 
     static receiveMsg* rMsgDialog = new receiveMsg();
-    //rMsgDialog->setModel(receiveMsgLogModel);
-    rMsgDialog->setIndexWidget(index,itemWidget);
+    rMsgDialog->setModel(receiveMsgLogModel);
+    rMsgDialog->setIndexWidget(index);
     rMsgDialog->show();
 }
