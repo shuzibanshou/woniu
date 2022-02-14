@@ -758,9 +758,23 @@ void woniu::onServerReadyReadMsg(){
     //qDebug() << receiveBytes;
     receiveMsgLogModel->insertRow(receiveMsgLogModel->rowCount());              //插入新行
     QModelIndex index = receiveMsgLogModel->index(receiveMsgLogModel->rowCount() - 1, 0);
-    receiveMsgLogModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
+    //receiveMsgLogModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
+
+    //设置item布局
+    QWidget *itemWidget = new QWidget;
+    QLabel *deviceName = new QLabel(itemWidget);
+    deviceName->setObjectName(QStringLiteral("deviceName"));
+    QFont font1;
+    font1.setFamily(QStringLiteral("Arial"));
+    font1.setPointSize(12);
+    deviceName->setFont(font1);
+    deviceName->setAlignment(Qt::AlignCenter);
+    deviceName->setText(receiveBytes);
+    deviceName->setMinimumWidth(80);
+    deviceName->setMaximumWidth(80);
 
     static receiveMsg* rMsgDialog = new receiveMsg();
-    rMsgDialog->setModel(receiveMsgLogModel);
+    //rMsgDialog->setModel(receiveMsgLogModel);
+    rMsgDialog->setIndexWidget(index,itemWidget);
     rMsgDialog->show();
 }

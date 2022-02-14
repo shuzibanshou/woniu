@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QStringListModel>
+#include <QLineEdit>
 
 namespace Ui {
 class receiveMsg;
@@ -16,6 +17,7 @@ public:
     explicit receiveMsg(QWidget *parent = nullptr);
     ~receiveMsg();
     void setModel(QStringListModel*);
+    void setIndexWidget(const QModelIndex &, QWidget *);
 private:
     Ui::receiveMsg *ui;
 };
