@@ -17,6 +17,11 @@
 #include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QCheckBox>
+#include <QStandardItemModel>
+#include <QStandardItem>
+
+#include <QDebug>
 
 namespace Ui {
 class receiveMsg;
@@ -25,12 +30,11 @@ class receiveMsg;
 class receiveMsg : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit receiveMsg(QWidget *parent = nullptr);
     ~receiveMsg();
     void setModel(QStringListModel*);
-    void setIndexWidget(const QModelIndex &);
+    void setIndexWidget(const QModelIndex &,QString,QString);
 private:
     Ui::receiveMsg *ui;
 };

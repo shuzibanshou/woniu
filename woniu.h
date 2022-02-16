@@ -55,7 +55,6 @@ typedef struct
 class woniu : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit woniu(QWidget *parent = nullptr);
     ~woniu();

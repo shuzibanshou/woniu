@@ -758,23 +758,20 @@ void woniu::onServerReadyReadMsg(){
     //qDebug() << receiveBytes;
     receiveMsgLogModel->insertRow(receiveMsgLogModel->rowCount());              //插入新行
     QModelIndex index = receiveMsgLogModel->index(receiveMsgLogModel->rowCount() - 1, 0);
-    //receiveMsgLogModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
+    QString ip = tcpSocketMsgClientList->peerAddress().toString();
+    QString time  = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    //封装模型数据
+//    QMap<QString,QVariant> modelItemData = QMap<QString,QVariant>();
+//    modelItemData.insert("ip","192.168.1.1");
+//    modelItemData.insert("time","2022-02-16 00:00:00");
+//    modelItemData.insert("receiveBytes",receiveBytes);
+//    qDebug()<< modelItemData;
 
-    //设置item布局
-    QWidget *itemWidget = new QWidget;
-    QLabel *deviceName = new QLabel(itemWidget);
-    deviceName->setObjectName(QStringLiteral("deviceName"));
-    QFont font1;
-    font1.setFamily(QStringLiteral("Arial"));
-    font1.setPointSize(12);
-    deviceName->setFont(font1);
-    deviceName->setAlignment(Qt::AlignCenter);
-    deviceName->setText(receiveBytes);
-    deviceName->setMinimumWidth(80);
-    deviceName->setMaximumWidth(80);
-
+//    QVariant temp(modelItemData); //QMap 转 QVariant
+//    qDebug()<< temp;
+    receiveMsgLogModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
     static receiveMsg* rMsgDialog = new receiveMsg();
     rMsgDialog->setModel(receiveMsgLogModel);
-    rMsgDialog->setIndexWidget(index);
+    rMsgDialog->setIndexWidget(index,ip,time);
     rMsgDialog->show();
 }

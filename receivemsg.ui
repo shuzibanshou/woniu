@@ -6,27 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
-    <height>342</height>
+    <width>445</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>您有新消息到达</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QListView" name="receiveMsgLog">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>441</width>
-     <height>321</height>
+     <width>425</width>
+     <height>301</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color:transparent</string>
    </property>
   </widget>
  </widget>
