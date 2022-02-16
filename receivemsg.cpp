@@ -8,6 +8,7 @@ receiveMsg::receiveMsg(QWidget *parent) :
     ui->setupUi(this);
     ui->receiveMsgLog->setStyleSheet("QListView{background-color:transparent;}");
     ui->receiveMsgLog->setFrameShape(QListView::NoFrame);
+    connect(ui->receiveMsgLog,SIGNAL(clicked(QModelIndex)),this,SLOT(itemClicked(QModelIndex)));
 
 //    QStandardItemModel *model = new QStandardItemModel(ui->receiveMsgLog);
 //    ui->receiveMsgLog->setModel(model);
@@ -127,4 +128,12 @@ void receiveMsg::setIndexWidget(const QModelIndex &index,QString ip,QString time
     qint32 itemHeight =  ui->receiveMsgLog->sizeHintForRow(index.row());
     ui->receiveMsgLog->setCurrentIndex(index);
     ui->receiveMsgLog->setStyleSheet("QListView::item{height:"+QString::number(itemHeight)+"px;background-color:transparent;}");    //透明设置失效?
+}
+
+void receiveMsg::itemClicked(QModelIndex index)
+{
+    //qDebug() << index.data().toString();
+    QClipboard *clip = QApplication::clipboard();
+    clip->setText(index.data().toString());
+    Toast::showTip(QString("复制成功"), this);
 }

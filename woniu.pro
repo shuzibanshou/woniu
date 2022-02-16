@@ -15,6 +15,7 @@ SOURCES += \
     receivefile.cpp \
     receivemsg.cpp \
     sendmsg.cpp \
+    toast.cpp \
     woniu.cpp
 
 HEADERS += \
@@ -23,6 +24,7 @@ HEADERS += \
     receivefile.h \
     receivemsg.h \
     sendmsg.h \
+    toast.h \
     woniu.h
 
 FORMS += \
@@ -30,6 +32,8 @@ FORMS += \
     receivefile.ui \
     receivemsg.ui \
     sendmsg.ui \
+    toast.ui \
+    toast.ui \
     woniu.ui
 
 TRANSLATIONS += \
@@ -43,4 +47,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    sysIcon.qrc
+    sysIcon.qrc \
+    toast.qrc

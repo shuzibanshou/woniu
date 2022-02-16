@@ -20,8 +20,10 @@
 #include <QtWidgets/QCheckBox>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QClipboard>
 
 #include <QDebug>
+#include <toast.h>
 
 namespace Ui {
 class receiveMsg;
@@ -37,6 +39,9 @@ public:
     void setIndexWidget(const QModelIndex &,QString,QString);
 private:
     Ui::receiveMsg *ui;
+
+private slots:
+    void itemClicked(QModelIndex);
 };
 
 #endif // RECEIVEMSG_H
