@@ -49,3 +49,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     sysIcon.qrc \
     toast.qrc
+RC_ICONS = icons/logo.ico

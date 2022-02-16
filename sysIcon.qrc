@@ -12,5 +12,6 @@
         <file>icons/windows-10.png</file>
         <file>icons/windows-xp.png</file>
         <file>icons/windows-8.png</file>
+        <file>icons/logo.ico</file>
     </qresource>
 </RCC>
