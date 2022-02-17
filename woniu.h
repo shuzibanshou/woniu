@@ -25,6 +25,7 @@
 #include <QStringListModel>
 
 #include "progress.h"
+#include "receivefile.h"
 
 namespace Ui {
 class woniu;
@@ -87,6 +88,7 @@ private:
     qint64 curFileIndex = 0;                                        //当前发送的文件在多文件对象序列的索引位置
     quint8 preparedSend = 0;                                        //是否准备发送文件内容 0 未准备 1 已收到接收端反馈 准备发送
 
+    receiveFile* rFile;                                             //是否接受文件提示窗口
     QStringList receiveFiles;                                       //接收多文件的信息序列
     QFile receiveFileHandle;                                        //接收文件对象
     QString saveFileName;                                           //当前接收文件名

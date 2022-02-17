@@ -558,8 +558,8 @@ void woniu::parseServerMessage(QByteArray data)
             qDebug() << "未收到任何文件消息";
         }
 
-        //实例化非模态对话框
-        receiveFile* rFile = new receiveFile(this);
+        //是否接受文件-实例化非模态对话框
+        rFile = new receiveFile(this);
         rFile->setIPv4(remoteIPv4Addr);
         rFile->setFileName(fileName);
         rFile->setFileSize(fileSize);
@@ -758,8 +758,7 @@ void woniu::rejectFile()
     QByteArray msg;
     msg.append(MessageType::rejectFile);
     tcpSocketFileClientList->write(msg);
-    this->close();
-
+    rFile->close();
 }
 
 //////
