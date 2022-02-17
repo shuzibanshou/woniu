@@ -566,6 +566,9 @@ void woniu::parseServerMessage(QByteArray data)
         rFile->setFileName(fileName);
         rFile->setFileSize(fileSize);
 
+        //qDebug() << fileName;
+        //qDebug() << fileSize;
+
         saveFileName = receiveFiles.at(curReceiveFileIndex).split("##")[0];
         saveDirPath = QCoreApplication::applicationDirPath() + "/receiveFiles";
         rFile->setSaveFilePath(saveDirPath);
@@ -573,7 +576,7 @@ void woniu::parseServerMessage(QByteArray data)
     } else {
         //已接收到文件基本信息
         //接收文件内容
-        qDebug() << data;
+        //qDebug() << data;
         if(data.length() > 0){
             qint64 len = 0;
             len = receiveFileHandle.write(data);
@@ -610,18 +613,6 @@ void woniu::parseServerMessage(QByteArray data)
 
             }
 
-            //qDebug() << saveFileSize;
-            //qDebug() << curSaveFileSize;
-//            if(curSaveFileSize == saveFileSize){
-//                curSaveFileSize = saveFileSize = receivedFileInfo = 0;
-//                receiveFileHandle.close();
-//                recvProgress->close();
-
-//                fileEndTransTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
-//                quint32 transNeedTime = fileEndTransTime - fileStartTransTime;
-//                //提示框是阻塞的 要放在最后面
-//                QMessageBox::information(this, "成功",QString("文件已接收完成,耗时%1秒").arg(transNeedTime),QMessageBox::Ok,QMessageBox::Ok);
-//            }
         }
     }
 }
@@ -648,7 +639,7 @@ void woniu::parseClientMessage(QByteArray data)
             sendFile(curFileIndex);
         } else if(MessageType::rejectFile == first){
             //拒绝接收文件
-
+            files.clear();
         } else if(MessageType::receiveSingleFile == first){
             //某个文件已接收完毕 curFileIndex++ 传输下一个文件 如果还有未传输的文件
             if((curFileIndex + 1) < files.length() ){
