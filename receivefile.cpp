@@ -9,6 +9,8 @@ receiveFile::receiveFile(QWidget *parent) : QDialog(parent),ui(new Ui::Dialog)
     this->setWindowFlag(Qt::WindowCloseButtonHint, false);
     connect(this, SIGNAL(acceptFile()), parent, SLOT(acceptFile()));
     connect(this, SIGNAL(rejectFile()), parent, SLOT(rejectFile()));
+    connect(this, SIGNAL(modifySaveFilePath(QString)), parent, SLOT(modifySaveFilePath(QString)));
+
 }
 
 void receiveFile::setIPv4(QString ipv4)
@@ -70,6 +72,7 @@ void receiveFile::on_modifySaveFilePath_clicked()
     saveFilePath = QFileDialog::getExistingDirectory(this, "更改接收文件存储路径","/");
     if(!saveFilePath.isEmpty()){
         ui->saveFilePath->setText(saveFilePath);
+        emit modifySaveFilePath(saveFilePath);
     }
 }
 

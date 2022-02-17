@@ -150,6 +150,7 @@ private slots:
     //void on_remoteDevice_clicked(const QModelIndex &index);
     void acceptFile();                                              //确认接收文件
     void rejectFile();                                              //拒收文件
+    void modifySaveFilePath(QString);                               //修改文件保存路径
     //void retransMissionPacket();                                  //重发UDP数据包
 };
 

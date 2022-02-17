@@ -451,7 +451,7 @@ void woniu:: openFile(){
 //    }
 
     QStringList filePaths = QFileDialog::getOpenFileNames(this,"open","../");  //选择多文件
-    qDebug() << filePaths;
+    //qDebug() << filePaths;
     if(filePaths.length() > 0){
         QStringList temp;
         foreach(auto filePath,filePaths){
@@ -478,6 +478,7 @@ void woniu:: openFile(){
             tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
         }
         //tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
+        qDebug() << res;
         tcpSocketFileClient->write(res.toUtf8());
     }
 
@@ -568,11 +569,11 @@ void woniu::parseServerMessage(QByteArray data)
         saveFileName = receiveFiles.at(curReceiveFileIndex).split("##")[0];
         saveDirPath = QCoreApplication::applicationDirPath() + "/receiveFiles";
         rFile->setSaveFilePath(saveDirPath);
-        saveFilePath = saveDirPath + "/" + saveFileName;
         rFile->show();
     } else {
         //已接收到文件基本信息
         //接收文件内容
+        qDebug() << data;
         if(data.length() > 0){
             qint64 len = 0;
             len = receiveFileHandle.write(data);
@@ -647,6 +648,7 @@ void woniu::parseClientMessage(QByteArray data)
             sendFile(curFileIndex);
         } else if(MessageType::rejectFile == first){
             //拒绝接收文件
+
         } else if(MessageType::receiveSingleFile == first){
             //某个文件已接收完毕 curFileIndex++ 传输下一个文件 如果还有未传输的文件
             if((curFileIndex + 1) < files.length() ){
@@ -730,6 +732,7 @@ void woniu::acceptFile()
     //打开接收文件句柄
     //qDebug() << saveFilePath;
     receivedFileInfo = 1;
+    saveFilePath = saveDirPath + "/" + saveFileName;
     receiveFileHandle.setFileName(saveFilePath);
     bool succ = receiveFileHandle.open(QIODevice::WriteOnly);
     if(succ){
@@ -761,6 +764,15 @@ void woniu::rejectFile()
     msg.append(MessageType::rejectFile);
     tcpSocketFileClientList->write(msg);
     rFile->close();
+}
+
+/**
+ * 修改文件保存路径
+ * @brief woniu::modifySaveFilePath
+ */
+void woniu::modifySaveFilePath(QString newSaveFilePath)
+{
+    saveDirPath = newSaveFilePath;
 }
 
 //////

@@ -26,6 +26,7 @@ class receiveFile : public QDialog
     signals:
         void acceptFile();
         void rejectFile();
+        void modifySaveFilePath(QString);
     private:
         Ui::Dialog *ui;
         QString saveFilePath;
