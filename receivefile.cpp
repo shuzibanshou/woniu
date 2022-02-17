@@ -66,7 +66,9 @@ void receiveFile::on_modifySaveFilePath_clicked()
 {
     //文件夹路径
     saveFilePath = QFileDialog::getExistingDirectory(this, "更改接收文件存储路径","/");
-    ui->saveFilePath->setText(saveFilePath);
+    if(!saveFilePath.isEmpty()){
+        ui->saveFilePath->setText(saveFilePath);
+    }
 }
 
 /**
@@ -77,7 +79,7 @@ void receiveFile::on_acceptFile_clicked()
 {
     //先检测目录是否存在 不存在则尝试创建目录
     QDir dir(saveFilePath);
-    if(!dir.exists() && dir.mkpath(saveFilePath)){
+    if(!dir.exists() && !dir.mkpath(saveFilePath)){
         QMessageBox::warning(this, tr("提示"),tr("该目录不存在,且无法创建\n请检查权限并手动创建"),QMessageBox::Ok,QMessageBox::Ok);
         return;
     }

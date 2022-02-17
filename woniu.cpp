@@ -477,7 +477,8 @@ void woniu:: openFile(){
         if(tcpSocketFileClient->state() == QAbstractSocket::SocketState::UnconnectedState){
             tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
         }
-        tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
+        //tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
+        tcpSocketFileClient->write(res.toUtf8());
     }
 
     //TODO
@@ -728,6 +729,7 @@ void woniu::getSysIcon()
 void woniu::acceptFile()
 {
     //打开接收文件句柄
+    qDebug() << saveFilePath;
     receiveFileHandle.setFileName(saveFilePath);
     bool succ = receiveFileHandle.open(QIODevice::WriteOnly);
     if(succ){
