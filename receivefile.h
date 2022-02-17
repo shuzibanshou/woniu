@@ -30,10 +30,12 @@ class receiveFile : public QDialog
         QString saveFilePath;
 
     private slots:
-
         void on_modifySaveFilePath_clicked();
-        void on_pushButton_2_clicked();
-        void on_pushButton_3_clicked();
+        void on_rejectFile_clicked();
+        void on_acceptFile_clicked();
+
+protected:
+        void closeEvent(QCloseEvent*);
 };
 
 #endif // RECEIVEFILE_H

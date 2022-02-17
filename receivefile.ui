@@ -188,7 +188,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="acceptFile">
          <property name="text">
           <string>接收</string>
          </property>
@@ -208,7 +208,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="rejectFile">
          <property name="text">
           <string>拒绝</string>
          </property>

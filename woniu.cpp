@@ -755,6 +755,7 @@ void woniu::acceptFile()
 void woniu::rejectFile()
 {
     //qDebug() << "拒绝接收文件";
+    receivedFileInfo = 0;
     QByteArray msg;
     msg.append(MessageType::rejectFile);
     tcpSocketFileClientList->write(msg);

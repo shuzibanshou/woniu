@@ -71,9 +71,9 @@ void receiveFile::on_modifySaveFilePath_clicked()
 
 /**
  * 接收新文件
- * @brief receiveFile::on_pushButton_2_clicked
+ * @brief receiveFile::on_acceptFile_clicked
  */
-void receiveFile::on_pushButton_2_clicked()
+void receiveFile::on_acceptFile_clicked()
 {
     //先检测目录是否存在 不存在则尝试创建目录
     QDir dir(saveFilePath);
@@ -91,8 +91,21 @@ void receiveFile::on_pushButton_2_clicked()
  * 拒收新文件
  * @brief receiveFile::on_pushButton_3_clicked
  */
-void receiveFile::on_pushButton_3_clicked()
+void receiveFile::on_rejectFile_clicked()
 {
     //向父窗口发送拒收文件消息
     emit rejectFile();
 }
+
+/**
+ * 监控窗口关闭
+ * @brief receiveFile::closeEvent
+ * @param event
+ */
+void receiveFile::closeEvent(QCloseEvent *event)
+{
+    Q_UNUSED(event)
+    //向父窗口发送拒收文件消息
+    emit rejectFile();
+}
+
