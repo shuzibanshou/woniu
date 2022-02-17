@@ -11,6 +11,7 @@
 woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 {
     ui->setupUi(this);
+    this->setFixedSize(QSize(380,530));
     //qsrand(QTime::currentTime().msec());
     getSysIcon();
     localIPv4 = getHostIP();
