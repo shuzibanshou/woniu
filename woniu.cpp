@@ -451,32 +451,34 @@ void woniu:: openFile(){
 //    }
 
     QStringList filePaths = QFileDialog::getOpenFileNames(this,"open","../");  //选择多文件
-    QStringList temp;
-    foreach(auto filePath,filePaths){
-        if(!filePath.isEmpty()){
-            //判断文件是否可读
-            QFile* _file = new QFile(filePath);
-            if(_file->open(QIODevice::ReadOnly)){
-                files.append(_file);
+    qDebug() << filePaths;
+    if(filePaths.length() > 0){
+        QStringList temp;
+        foreach(auto filePath,filePaths){
+            if(!filePath.isEmpty()){
+                //判断文件是否可读
+                QFile* _file = new QFile(filePath);
+                if(_file->open(QIODevice::ReadOnly)){
+                    files.append(_file);
 
-                QFileInfo info(filePath);
-                QString singleFileName = info.fileName();
-                quint64 singleFileSize = info.size();
-                fileSize += singleFileSize;
-                QString fi = QString("%1##%2").arg(singleFileName).arg(singleFileSize);
-                temp.append(fi);
-            } else {
-                QMessageBox::critical(this, tr("错误"),tr("文件无法打开"),QMessageBox::Ok,QMessageBox::Ok);
-                return;
+                    QFileInfo info(filePath);
+                    QString singleFileName = info.fileName();
+                    quint64 singleFileSize = info.size();
+                    fileSize += singleFileSize;
+                    QString fi = QString("%1##%2").arg(singleFileName).arg(singleFileSize);
+                    temp.append(fi);
+                } else {
+                    QMessageBox::critical(this, tr("错误"),tr("文件无法打开"),QMessageBox::Ok,QMessageBox::Ok);
+                    return;
+                }
             }
         }
+        QString res = temp.join("||");
+        if(tcpSocketFileClient->state() == QAbstractSocket::SocketState::UnconnectedState){
+            tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+        }
+        tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
     }
-    QString res = temp.join("||");
-    if(tcpSocketFileClient->state() == QAbstractSocket::SocketState::UnconnectedState){
-        tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
-    }
-    tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
-    //qDebug() << res;
 
     //TODO
     //QString srcDirPath = QFileDialog::getExistingDirectory(this, "choose src Directory","/"); //选择文件夹
@@ -746,9 +748,18 @@ void woniu::acceptFile()
 
 }
 
+/**
+ * 拒绝接收文件并关闭窗口
+ * @brief woniu::rejectFile
+ */
 void woniu::rejectFile()
 {
-    qDebug() << "拒绝接收文件";
+    //qDebug() << "拒绝接收文件";
+    QByteArray msg;
+    msg.append(MessageType::rejectFile);
+    tcpSocketFileClientList->write(msg);
+    this->close();
+
 }
 
 //////
