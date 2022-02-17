@@ -5,6 +5,8 @@ receiveFile::receiveFile(QWidget *parent) : QDialog(parent),ui(new Ui::Dialog)
 {
     //ui一定要记得初始化
     ui->setupUi(this);
+    //禁用窗口右上角关闭按钮
+    this->setWindowFlag(Qt::WindowCloseButtonHint, false);
     connect(this, SIGNAL(acceptFile()), parent, SLOT(acceptFile()));
     connect(this, SIGNAL(rejectFile()), parent, SLOT(rejectFile()));
 }
@@ -107,7 +109,8 @@ void receiveFile::on_rejectFile_clicked()
 void receiveFile::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
+    //qDebug() << event;
     //向父窗口发送拒收文件消息
-    emit rejectFile();
+    //emit rejectFile();
 }
 

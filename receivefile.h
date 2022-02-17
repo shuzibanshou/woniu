@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 namespace Ui {
 class Dialog;

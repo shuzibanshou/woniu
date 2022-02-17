@@ -537,9 +537,9 @@ void woniu::onClientReadyRead()
  */
 void woniu::parseServerMessage(QByteArray data)
 {
-    if(receivedFileInfo == 0){
-        receivedFileInfo = 1;
 
+    if(receivedFileInfo == 0){
+        //qDebug() << receivedFileInfo;
         QString receiveData = QString::fromUtf8(data);
         receiveFiles = receiveData.split("||");
         QString fileSize,fileName;
@@ -573,7 +573,6 @@ void woniu::parseServerMessage(QByteArray data)
     } else {
         //已接收到文件基本信息
         //接收文件内容
-        //qDebug() << data;
         if(data.length() > 0){
             qint64 len = 0;
             len = receiveFileHandle.write(data);
@@ -729,7 +728,8 @@ void woniu::getSysIcon()
 void woniu::acceptFile()
 {
     //打开接收文件句柄
-    qDebug() << saveFilePath;
+    //qDebug() << saveFilePath;
+    receivedFileInfo = 1;
     receiveFileHandle.setFileName(saveFilePath);
     bool succ = receiveFileHandle.open(QIODevice::WriteOnly);
     if(succ){
@@ -757,7 +757,6 @@ void woniu::acceptFile()
 void woniu::rejectFile()
 {
     //qDebug() << "拒绝接收文件";
-    receivedFileInfo = 0;
     QByteArray msg;
     msg.append(MessageType::rejectFile);
     tcpSocketFileClientList->write(msg);
