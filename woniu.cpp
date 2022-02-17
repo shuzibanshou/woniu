@@ -773,6 +773,6 @@ void woniu::onServerReadyReadMsg(){
     receiveMsgLogModel->setData(index,receiveBytes,Qt::DisplayRole);      //设置接收到的文本消息
     static receiveMsg* rMsgDialog = new receiveMsg();
     rMsgDialog->setModel(receiveMsgLogModel);
-    rMsgDialog->setIndexWidget(index,ip,time);
+    //rMsgDialog->setIndexWidget(index,ip,time);
     rMsgDialog->show();
 }
