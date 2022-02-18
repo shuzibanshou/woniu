@@ -6,11 +6,13 @@ receiveFile::receiveFile(QWidget *parent) : QDialog(parent),ui(new Ui::Dialog)
     //ui一定要记得初始化
     ui->setupUi(this);
     //禁用窗口右上角关闭按钮
-    this->setWindowFlag(Qt::WindowCloseButtonHint, false);
+    //this->setWindowFlag(Qt::WindowCloseButtonHint, false);
     connect(this, SIGNAL(acceptFile()), parent, SLOT(acceptFile()));
     connect(this, SIGNAL(rejectFile()), parent, SLOT(rejectFile()));
     connect(this, SIGNAL(modifySaveFilePath(QString)), parent, SLOT(modifySaveFilePath(QString)));
-
+    //ui->acceptFile->installEventFilter(this);
+    //ui->rejectFile->installEventFilter(this);
+    //installEventFilter(this);
 }
 
 void receiveFile::setIPv4(QString ipv4)
@@ -89,6 +91,7 @@ void receiveFile::on_acceptFile_clicked()
         return;
     }
     //向父窗口发送接收文件消息
+    accept = 1;
     emit acceptFile();
     //关闭弹窗
     this->close();
@@ -100,8 +103,8 @@ void receiveFile::on_acceptFile_clicked()
  */
 void receiveFile::on_rejectFile_clicked()
 {
-    //向父窗口发送拒收文件消息
-    emit rejectFile();
+    //关闭弹窗
+    this->close();
 }
 
 /**
@@ -112,8 +115,15 @@ void receiveFile::on_rejectFile_clicked()
 void receiveFile::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
-    //qDebug() << event;
-    //向父窗口发送拒收文件消息
-    //emit rejectFile();
+    if(accept != 1){
+        //向父窗口发送拒收文件消息
+        emit rejectFile();
+    }
 }
+
+//bool receiveFile::eventFilter(QObject *obj, QEvent *event)
+//{
+//    qDebug() << obj << event;
+//    return QDialog::eventFilter(obj,event);
+//}
 

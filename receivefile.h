@@ -23,6 +23,7 @@ class receiveFile : public QDialog
         void setFileSize(QString);
         QString formateFileSize(QString);
         void setSaveFilePath(QString);
+
     signals:
         void acceptFile();
         void rejectFile();
@@ -30,6 +31,7 @@ class receiveFile : public QDialog
     private:
         Ui::Dialog *ui;
         QString saveFilePath;
+        quint8 accept = 0;      //是否点击了接收按钮 0 未点击 1 已点击
 
     private slots:
         void on_modifySaveFilePath_clicked();
@@ -38,6 +40,7 @@ class receiveFile : public QDialog
 
 protected:
         void closeEvent(QCloseEvent*);
+        //bool eventFilter(QObject *, QEvent *);
 };
 
 #endif // RECEIVEFILE_H
