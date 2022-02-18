@@ -25,6 +25,7 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 
     broadcastTimer = new QTimer(this);
     scanDevicesTimer = new QTimer(this);
+    checkFireWallTimer = new QTimer(this);
     //retransMissionTimer = new QTimer(this);
 //    for(quint16 port = initPort;; port++){
 //        if(udpSocket->bind(port)){
@@ -59,7 +60,7 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(onSocketReadyRead()));
     connect(broadcastTimer,SIGNAL(timeout()),this,SLOT(lanBroadcast()));
     connect(scanDevicesTimer,SIGNAL(timeout()),this,SLOT(scanDevices()));
-    //connect(retransMissionTimer,SIGNAL(timeout()),this,SLOT(retransMissionPacket()));
+    connect(checkFireWallTimer,SIGNAL(timeout()),this,SLOT(checkFireWall()));
 
     //有新连接到达服务端
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
@@ -76,6 +77,7 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     lanBroadcast();
     broadcastTimer->start(broadcastInterval);
     scanDevicesTimer->start(scanDevicesInterval);
+    checkFireWallTimer->start(checkFireWallInterval);
 }
 
 woniu::~woniu()
@@ -262,6 +264,12 @@ void woniu::scanDevices()
     lanDevices = newLanDevices;
 }
 
+void woniu::checkFireWall()
+{
+    QMessageBox::critical(this, tr("错误"),tr("请检查防火墙是否放行了10000,20001,20002端口，若没有请放行或者关闭防火墙再进行文件和消息传输"),QMessageBox::Ok,QMessageBox::Ok);
+    return;
+}
+
 /**
  * @brief woniu::onSocketStateChanged
  * @param socketState
@@ -300,6 +308,8 @@ void woniu::onSocketStateChanged(QAbstractSocket::SocketState socketState)
 void woniu::onSocketReadyRead()
 {
     //qDebug() << udpSocket->state();
+    checkFireWallTimer->stop();
+    checkFireWallTimer->start(checkFireWallInterval);
     while(udpSocket->hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(static_cast<int>(udpSocket->pendingDatagramSize()));
