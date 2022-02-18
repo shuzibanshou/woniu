@@ -19,5 +19,6 @@ int main(int argc, char *argv[])
     }
     woniu w;
     w.show();
+
     return a.exec();
 }

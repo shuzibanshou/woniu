@@ -88,7 +88,6 @@ private:
     qint64 curFileIndex = 0;                                        //当前发送的文件在多文件对象序列的索引位置
     quint8 preparedSend = 0;                                        //是否准备发送文件内容 0 未准备 1 已收到接收端反馈 准备发送
 
-    receiveFile* rFile;                                             //是否接受文件提示窗口
     QStringList receiveFiles;                                       //接收多文件的信息序列
     QFile receiveFileHandle;                                        //接收文件对象
     QString saveFileName;                                           //当前接收文件名
@@ -117,9 +116,11 @@ private:
 
     quint16 broadcastInterval = 5000;                               //局域网UDP循环广播时间间隔 默认5000毫秒
     quint16 scanDevicesInterval = 5000;                             //扫描活跃设备的时间间隔
+    quint16 checkFireWallInterval = broadcastInterval + 3000;       //检查防火墙状态定时器时间间隔 在广播时间间隔基础上增加3000毫秒
     quint16 unactiveTimeout = 8;                                    //非活跃设备超时时间 默认 8秒
     QTimer*  broadcastTimer;                                        //局域网UDP循环广播定时器
     QTimer*  scanDevicesTimer;                                      //扫描活跃设备定时器
+    QTimer*  checkFireWallTimer;                                    //检查防火墙状态定时器
 
     QMap<QString,deviceItem> lanDevices;                            //局域网内设备IPv4地址合集-定时扫描踢出下线设备
     QMap<QString,deviceItem> newLanDevices;                         //下一次扫描新的局域网内设备IPv4地址合集 比对旧的数据 分别新增或更新widgetItem
@@ -140,6 +141,7 @@ private slots:
     void onSocketReadyRead();
     void lanBroadcast();                                            //程序启动时进行局域网广播
     void scanDevices();                                             //扫描活跃设备
+    void checkFireWall();                                           //检查防火墙状态
     void openFile();                                                //打开文件管理器
     void openMsgDialog();                                           //打开发送消息框
     void onNewConnection();
