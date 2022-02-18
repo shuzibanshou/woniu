@@ -5,6 +5,7 @@
 #include "sendmsg.h"
 #include "receivemsg.h"
 #include "progress.h"
+#include "remoteitem.h"
 
 #include "common.h"
 
@@ -329,62 +330,68 @@ void woniu::onSocketReadyRead()
  * @param dev
  */
 void woniu:: addWidgetItem(QString key,deviceItem di){
-    QListWidgetItem* remoteItem = new  QListWidgetItem(ui->remoteDevice);
-    remoteItem->setSizeHint(QSize(10,100));
+    QListWidgetItem* item = new  QListWidgetItem(ui->remoteDevice);
+    //设置每个item的尺寸
+    item->setSizeHint(QSize(300,50));
     //保存该item
-    newLanDevices[key].item = remoteItem;
+    newLanDevices[key].item = item;
+
     //设置item布局
-    QWidget *itemWidget = new QWidget;
+//    QWidget *itemWidget = new QWidget;
 
-    QLabel *deviceName = new QLabel(itemWidget);
-    deviceName->setObjectName(QStringLiteral("deviceName"));
-    QFont font1;
-    font1.setFamily(QStringLiteral("Arial"));
-    font1.setPointSize(12);
-    deviceName->setFont(font1);
-    deviceName->setAlignment(Qt::AlignCenter);
-    deviceName->setText(di.deviceName);
-    deviceName->setMinimumWidth(80);
-    deviceName->setMaximumWidth(80);
-    //文本在label溢出则显示...
-    QString text(di.deviceName);
-    QFontMetrics metrics(deviceName->font());
-    QString elidedText = metrics.elidedText(text, Qt::ElideRight, deviceName->width());
-    deviceName->setText(elidedText);
+//    QLabel *deviceName = new QLabel(itemWidget);
+//    deviceName->setObjectName(QStringLiteral("deviceName"));
+//    QFont font1;
+//    font1.setFamily(QStringLiteral("Arial"));
+//    font1.setPointSize(12);
+//    deviceName->setFont(font1);
+//    deviceName->setAlignment(Qt::AlignCenter);
+//    deviceName->setText(di.deviceName);
+//    deviceName->setMinimumWidth(80);
+//    deviceName->setMaximumWidth(80);
+//    //文本在label溢出则显示...
+//    QString text(di.deviceName);
+//    QFontMetrics metrics(deviceName->font());
+//    QString elidedText = metrics.elidedText(text, Qt::ElideRight, deviceName->width());
+//    deviceName->setText(elidedText);
 
-    QLabel *deviceIPv4 = new QLabel(itemWidget);
-    deviceName->setObjectName(QStringLiteral("deviceIPv4"));
-    QFont font2;
-    font2.setFamily(QStringLiteral("Arial"));
-    font2.setPointSize(10);
-    deviceIPv4->setFont(font2);
-    deviceName->setAlignment(Qt::AlignCenter);
-    deviceIPv4->setText(di.deviceIPv4);
-    deviceIPv4->setMinimumWidth(100);
-    deviceIPv4->setMaximumWidth(100);
+//    QLabel *deviceIPv4 = new QLabel(itemWidget);
+//    deviceName->setObjectName(QStringLiteral("deviceIPv4"));
+//    QFont font2;
+//    font2.setFamily(QStringLiteral("Arial"));
+//    font2.setPointSize(10);
+//    deviceIPv4->setFont(font2);
+//    deviceName->setAlignment(Qt::AlignCenter);
+//    deviceIPv4->setText(di.deviceIPv4);
+//    deviceIPv4->setMinimumWidth(100);
+//    deviceIPv4->setMaximumWidth(100);
 
-    QPushButton *sendFile = new QPushButton(itemWidget);
-    sendFile->setObjectName(QStringLiteral("sendFile"));
-    sendFile->setProperty("ip",di.deviceIPv4);
-    sendFile->setText(QApplication::translate("woniu", "\345\217\221\351\200\201\346\226\207\344\273\266", Q_NULLPTR));
+//    QPushButton *sendFile = new QPushButton(itemWidget);
+//    sendFile->setObjectName(QStringLiteral("sendFile"));
+//    sendFile->setProperty("ip",di.deviceIPv4);
+//    sendFile->setText(QApplication::translate("woniu", "\345\217\221\351\200\201\346\226\207\344\273\266", Q_NULLPTR));
 
-    QPushButton *sendMsg = new QPushButton(itemWidget);
-    sendMsg->setObjectName(QStringLiteral("sendMsg"));
-    sendMsg->setProperty("ip",di.deviceIPv4);
-    sendMsg->setText(QApplication::translate("woniu", "\345\217\221\351\200\201\346\266\210\346\201\257", Q_NULLPTR));
+//    QPushButton *sendMsg = new QPushButton(itemWidget);
+//    sendMsg->setObjectName(QStringLiteral("sendMsg"));
+//    sendMsg->setProperty("ip",di.deviceIPv4);
+//    sendMsg->setText(QApplication::translate("woniu", "\345\217\221\351\200\201\346\266\210\346\201\257", Q_NULLPTR));
 
-    QHBoxLayout *layout = new QHBoxLayout(itemWidget);
-    layout->addWidget(deviceName);
-    layout->addWidget(deviceIPv4);
-    layout->addWidget(sendFile);
-    layout->addWidget(sendMsg);
-    itemWidget->setLayout(layout);
-    ui->remoteDevice->setItemWidget(remoteItem,itemWidget);
+//    QHBoxLayout *layout = new QHBoxLayout(itemWidget);
+//    layout->addWidget(deviceName);
+//    layout->addWidget(deviceIPv4);
+//    layout->addWidget(sendFile);
+//    layout->addWidget(sendMsg);
+//    itemWidget->setLayout(layout);
 
-    //sendMsgBtnList.append(sendMsg);
+    //封装item widget
+    remoteItem* itemWidget = new remoteItem;
+
+    ui->remoteDevice->setItemWidget(item,itemWidget);
+
+    //ui->remoteDevice->setStyleSheet("QListWidget::item{background-color:red;}"); //无效
     //是否会内存泄漏
-    connect(sendFile,SIGNAL(clicked()),this,SLOT(openFile()));
-    connect(sendMsg,SIGNAL(clicked()),this,SLOT(openMsgDialog()));
+    //connect(sendFile,SIGNAL(clicked()),this,SLOT(openFile()));
+    //connect(sendMsg,SIGNAL(clicked()),this,SLOT(openMsgDialog()));
     //itemWidget->installEventFilter(this);
 }
 

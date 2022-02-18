@@ -14,6 +14,7 @@ SOURCES += \
     progress.cpp \
     receivefile.cpp \
     receivemsg.cpp \
+    remoteitem.cpp \
     sendmsg.cpp \
     toast.cpp \
     woniu.cpp
@@ -23,6 +24,7 @@ HEADERS += \
     progress.h \
     receivefile.h \
     receivemsg.h \
+    remoteitem.h \
     sendmsg.h \
     toast.h \
     woniu.h
@@ -31,6 +33,7 @@ FORMS += \
     progress.ui \
     receivefile.ui \
     receivemsg.ui \
+    remoteitem.ui \
     sendmsg.ui \
     toast.ui \
     toast.ui \

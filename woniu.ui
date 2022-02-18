@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
+    <width>390</width>
     <height>544</height>
    </rect>
   </property>
@@ -25,9 +25,21 @@
      <rect>
       <x>0</x>
       <y>60</y>
-      <width>380</width>
-      <height>491</height>
+      <width>390</width>
+      <height>490</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListWidget{
+	outline:none;
+	padding:5px 5px 5px 5px;
+	background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+stop:0 #c2e9fb,stop:1 #a1c4fd);
+}
+QListWidget::item{
+	background-color:rgb(255, 126, 90);
+	margin-bottom:5px;
+}</string>
     </property>
    </widget>
    <widget class="QWidget" name="header" native="true">
@@ -35,7 +47,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>381</width>
+      <width>390</width>
       <height>61</height>
      </rect>
     </property>
@@ -91,8 +103,6 @@ stop:0 #c2e9fb,stop:1 #a1c4fd);
            <widget class="QLabel" name="localNameLabel">
             <property name="font">
              <font>
-              <family>思源黑体 CN Normal</family>
-              <weight>50</weight>
               <bold>false</bold>
              </font>
             </property>
@@ -120,7 +130,6 @@ stop:0 #c2e9fb,stop:1 #a1c4fd);
            <widget class="QLabel" name="localName">
             <property name="font">
              <font>
-              <family>思源黑体 CN Bold</family>
               <pointsize>10</pointsize>
              </font>
             </property>
@@ -162,8 +171,6 @@ stop:0 #c2e9fb,stop:1 #a1c4fd);
            <widget class="QLabel" name="localIPv4Label">
             <property name="font">
              <font>
-              <family>思源黑体 CN Normal</family>
-              <weight>50</weight>
               <bold>false</bold>
               <stylestrategy>PreferAntialias</stylestrategy>
               <kerning>false</kerning>
@@ -187,7 +194,6 @@ stop:0 #c2e9fb,stop:1 #a1c4fd);
            <widget class="QLabel" name="localIPv4">
             <property name="font">
              <font>
-              <family>思源黑体 CN Bold</family>
               <pointsize>10</pointsize>
              </font>
             </property>
