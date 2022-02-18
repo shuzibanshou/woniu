@@ -19,7 +19,6 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QListWidget>
-//#include <QElapsedTimer>
 #include <QtMath>
 #include <QException>
 #include <QStringListModel>
@@ -39,7 +38,7 @@ enum MessageType{
     rejectFile = 0x4,               //拒绝接收该文件
     sentFile = 0x5,                 //文件发送完毕
     recUdpPackSucc = 0x06,          //UDP包接收成功反馈通知
-    recUdpPackFail = 0x07,           //UDP包接收失败反馈通知
+    recUdpPackFail = 0x07,          //UDP包接收失败反馈通知
     receiveSingleFile = 0x08,       //单个文件接收完毕
 };
 

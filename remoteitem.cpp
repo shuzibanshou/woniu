@@ -13,10 +13,10 @@ remoteItem::~remoteItem()
     delete ui;
 }
 
-//remoteItem::set()
-//{
-//    delete ui;
-//}
+void remoteItem::setData()
+{
+
+}
 
 void remoteItem::on_pushButton_clicked()
 {

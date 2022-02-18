@@ -14,6 +14,7 @@ class remoteItem : public QWidget
 public:
     explicit remoteItem(QWidget *parent = nullptr);
     ~remoteItem();
+    void setData();
 
 private slots:
     void on_pushButton_clicked();
