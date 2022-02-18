@@ -427,60 +427,61 @@ void woniu:: delWidgetItem(QString key){
 void woniu:: openFile(){
     QObject* o = sender();
     QString ip = o->property("ip").toString();
-    //QString filePath = QFileDialog::getOpenFileName(this,"open","../");  //选择文件
-    //qDebug() << filePath;
-//    if(!filePath.isEmpty()){
-//        QFileInfo info(filePath);
-//        fileName = info.fileName();
-//        fileSize = info.size();
+    QString filePath = QFileDialog::getOpenFileName(this,"open","../");  //选择文件
+    qDebug() << filePath;
+    QFile file;
+    if(!filePath.isEmpty()){
+        QFileInfo info(filePath);
+        fileName = info.fileName();
+        fileSize = info.size();
 
-//        //只读方式打开 file文件对象在私有成员变量中定义
-//        file.setFileName(filePath);
-//        bool succ = file.open(QIODevice::ReadOnly);
-//        if(succ){
-//            //连接文件接收方的服务器并向其发送文件信息
-//            tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
-//            QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
-//            qint32 block = tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
-//            qDebug() << "连接成功，发送字节数"+QString::number(block);
-//        } else {
-//            qDebug() << "打开文件失败";
-//        }
-//    } else {
-//        qDebug() << "文件路径有误";
-//    }
-
-    QStringList filePaths = QFileDialog::getOpenFileNames(this,"open","../");  //选择多文件
-    //qDebug() << filePaths;
-    if(filePaths.length() > 0){
-        QStringList temp;
-        foreach(auto filePath,filePaths){
-            if(!filePath.isEmpty()){
-                //判断文件是否可读
-                QFile* _file = new QFile(filePath);
-                if(_file->open(QIODevice::ReadOnly)){
-                    files.append(_file);
-
-                    QFileInfo info(filePath);
-                    QString singleFileName = info.fileName();
-                    quint64 singleFileSize = info.size();
-                    fileSize += singleFileSize;
-                    QString fi = QString("%1##%2").arg(singleFileName).arg(singleFileSize);
-                    temp.append(fi);
-                } else {
-                    QMessageBox::critical(this, tr("错误"),tr("文件无法打开"),QMessageBox::Ok,QMessageBox::Ok);
-                    return;
-                }
-            }
-        }
-        QString res = temp.join("||");
-        if(tcpSocketFileClient->state() == QAbstractSocket::SocketState::UnconnectedState){
+        //只读方式打开 file文件对象在私有成员变量中定义
+        file.setFileName(filePath);
+        bool succ = file.open(QIODevice::ReadOnly);
+        if(succ){
+            //连接文件接收方的服务器并向其发送文件信息
             tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+            QString fi = QString("%1##%2").arg(fileName).arg(fileSize); //整型消息格式不能以QString格式发送 会被转成对应字符的ASCII码
+            qint32 block = tcpSocketFileClient->write(fi.toUtf8().insert(0,MessageType::fileInfo));
+            qDebug() << "连接成功，发送字节数"+QString::number(block);
+        } else {
+            qDebug() << "打开文件失败";
         }
-        //tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
-        qDebug() << res;
-        tcpSocketFileClient->write(res.toUtf8());
+    } else {
+        qDebug() << "文件路径有误";
     }
+
+//    QStringList filePaths = QFileDialog::getOpenFileNames(this,"open","../");  //选择多文件
+//    //qDebug() << filePaths;
+//    if(filePaths.length() > 0){
+//        QStringList temp;
+//        foreach(auto filePath,filePaths){
+//            if(!filePath.isEmpty()){
+//                //判断文件是否可读
+//                QFile* _file = new QFile(filePath);
+//                if(_file->open(QIODevice::ReadOnly)){
+//                    files.append(_file);
+
+//                    QFileInfo info(filePath);
+//                    QString singleFileName = info.fileName();
+//                    quint64 singleFileSize = info.size();
+//                    fileSize += singleFileSize;
+//                    QString fi = QString("%1##%2").arg(singleFileName).arg(singleFileSize);
+//                    temp.append(fi);
+//                } else {
+//                    QMessageBox::critical(this, tr("错误"),tr("文件无法打开"),QMessageBox::Ok,QMessageBox::Ok);
+//                    return;
+//                }
+//            }
+//        }
+//        QString res = temp.join("||");
+//        if(tcpSocketFileClient->state() == QAbstractSocket::SocketState::UnconnectedState){
+//            tcpSocketFileClient->connectToHost(QHostAddress(ip),filePort);
+//        }
+//        //tcpSocketFileClient->write(res.toUtf8().insert(0,MessageType::fileInfo));
+//        qDebug() << res;
+//        tcpSocketFileClient->write(res.toUtf8());
+//    }
 
     //TODO
     //QString srcDirPath = QFileDialog::getExistingDirectory(this, "choose src Directory","/"); //选择文件夹
