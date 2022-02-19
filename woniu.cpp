@@ -386,7 +386,6 @@ void woniu:: addWidgetItem(QString key,deviceItem di){
 
     //封装item widget
     remoteItem* itemWidget = new remoteItem(this);
-    qDebug() << di.deviceOS;
     itemWidget->setData(di);
     ui->remoteDevice->setItemWidget(item,itemWidget);
 
