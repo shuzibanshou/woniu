@@ -715,12 +715,16 @@ void woniu::sendFile(quint64 index)
         unitBytes = buff.length();
         if(unitBytes > 0){
             unitBytes = tcpSocketFileClient->write(buff);
-//            if(unitBytes > 0){
-//                fileSentSize += unitBytes;
-//                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
-//                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
-//                }
-//            }
+            if(unitBytes > 0){
+                fileSentSize += unitBytes;
+                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
+                    qDebug() << fileSentSize;
+                    qDebug() << sendProgress->getValue();
+
+                    qDebug() << fileSize;
+                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+                }
+            }
         }
     } while(unitBytes > 0);
 }
