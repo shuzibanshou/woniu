@@ -786,7 +786,7 @@ void woniu::modifySaveFilePath(QString newSaveFilePath)
 }
 
 void woniu::updateClientProgress(qint64 writtenLen){
-    qDebug() << writtenLen;
+    qDebug() << "更新进度条"-writtenLen;
 }
 
 //////
