@@ -719,11 +719,18 @@ void woniu::sendFile(quint64 index)
 //            if(unitBytes > 0){
 //                fileSentSize += unitBytes;
 //                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
+<<<<<<< HEAD
 //                    //qDebug() << fileSentSize;
 //                    //qDebug() << sendProgress->getValue();
 
 //                    //qDebug() << fileSize;
 //                    //sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+=======
+////                    qDebug() << fileSentSize;
+////                    qDebug() << sendProgress->getValue();
+////                    qDebug() << fileSize;
+////                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+>>>>>>> 8df92a680de841fcbe714ac3857649cb61194e4a
 //                }
 //            }
         }
