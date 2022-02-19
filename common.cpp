@@ -29,3 +29,27 @@ QByteArray paddingQByteArray(quint64 data,quint8 paddingLength){
     }
     return qbytes;
 }
+
+/**
+ * 在界面上设置系统图标
+ * @brief getSysIcon
+ */
+void getSysIcon(QLabel* sysIconParamter,QString osTypeParamter = "",QString osVersionParamter = "")
+{
+    QString osType = osTypeParamter.isEmpty() ? QSysInfo::productType().toLower() : osTypeParamter;
+    QString osVersion = osVersionParamter.isEmpty() ? QSysInfo::productVersion() : osVersionParamter;
+    if(osType == "macos"){
+        sysIconParamter->setPixmap(QPixmap(":/sysIcon/icons/macos.png"));
+    } else if(osType == "ios"){
+        sysIconParamter->setPixmap(QPixmap(":/sysIcon/icons/iphone.png"));
+    } else if(osType == "ubuntu" || osType == "centos" || osType == "redhat" || osType == "debian" || osType == "suse" || osType == "android"){
+        sysIconParamter->setPixmap(QPixmap(":/sysIcon/icons/"+osType+".png"));
+    } else if(osType == "windows"){
+        QList<QString> ver = osVersion.split(".");
+        QString bigVer = ver.at(0);
+        sysIconParamter->setPixmap(QPixmap(":/sysIcon/icons/windows-"+bigVer+".png"));
+    } else {
+         sysIconParamter->setPixmap(QPixmap(":/sysIcon/icons/linux.png"));
+    }
+    //qDebug() << osVersion;
+}

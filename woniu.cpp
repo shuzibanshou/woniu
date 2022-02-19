@@ -14,7 +14,7 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     ui->setupUi(this);
     this->setFixedSize(QSize(390,530));
     //qsrand(QTime::currentTime().msec());
-    getSysIcon();
+    getSysIcon(ui->sysIcon,"","");
     localIPv4 = getHostIP();
     localDevice = getDeviceInfo();
     checkEnv();
@@ -157,8 +157,8 @@ QMap<QString,QString> woniu::getHostIP()
  */
 QString woniu::getDeviceInfo()
 {
-    QString localHost = QHostInfo::localHostName();
     QString os = QSysInfo::prettyProductName();
+    QString localHost = QHostInfo::localHostName();
     //deviceInfo dev = {.deviceOS = os,.deviceName = localHost};
     return os+"##"+localHost;
 }
@@ -385,6 +385,7 @@ void woniu:: addWidgetItem(QString key,deviceItem di){
 
     //封装item widget
     remoteItem* itemWidget = new remoteItem(this);
+    qDebug() << di.deviceOS;
     itemWidget->setData(di);
     ui->remoteDevice->setItemWidget(item,itemWidget);
 
@@ -709,25 +710,25 @@ void woniu::sendFile(quint64 index)
  * 在界面上设置系统图标
  * @brief woniu::getSysIcon
  */
-void woniu::getSysIcon()
-{
-    QString osType = QSysInfo::productType().toLower();
-    QString osVersion = QSysInfo::productVersion();
-    if(osType == "macos"){
-        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/macos.png"));
-    } else if(osType == "ios"){
-        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/iphone.png"));
-    } else if(osType == "ubuntu" || osType == "centos" || osType == "redhat" || osType == "debian" || osType == "suse" || osType == "android"){
-        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/"+osType+".png"));
-    } else if(osType == "windows"){
-        QList<QString> ver = osVersion.split(".");
-        QString bigVer = ver.at(0);
-        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/windows-"+bigVer+".png"));
-    } else {
-         ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/linux.png"));
-    }
-    //qDebug() << osVersion;
-}
+//void woniu::getSysIcon()
+//{
+//    QString osType = QSysInfo::productType().toLower();
+//    QString osVersion = QSysInfo::productVersion();
+//    if(osType == "macos"){
+//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/macos.png"));
+//    } else if(osType == "ios"){
+//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/iphone.png"));
+//    } else if(osType == "ubuntu" || osType == "centos" || osType == "redhat" || osType == "debian" || osType == "suse" || osType == "android"){
+//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/"+osType+".png"));
+//    } else if(osType == "windows"){
+//        QList<QString> ver = osVersion.split(".");
+//        QString bigVer = ver.at(0);
+//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/windows-"+bigVer+".png"));
+//    } else {
+//         ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/linux.png"));
+//    }
+//    //qDebug() << osVersion;
+//}
 
 
 

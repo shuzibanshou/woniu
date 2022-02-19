@@ -124,7 +124,7 @@ private:
     void itemPressed(QListWidgetItem *);
     void parseServerMessage(QByteArray);
     void parseClientMessage(QByteArray);
-    void getSysIcon();                                              //设置系统icon
+    //void getSysIcon();                                              //设置系统icon
 
 private slots:
     void sendFile(quint64);                                         //传输文件底层函数
