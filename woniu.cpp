@@ -158,9 +158,10 @@ QMap<QString,QString> woniu::getHostIP()
 QString woniu::getDeviceInfo()
 {
     QString os = QSysInfo::prettyProductName();
+    QString osVersion = QSysInfo::productVersion();
     QString localHost = QHostInfo::localHostName();
     //deviceInfo dev = {.deviceOS = os,.deviceName = localHost};
-    return os+"##"+localHost;
+    return os+"-"+osVersion+"##"+localHost;
 }
 
 /**
