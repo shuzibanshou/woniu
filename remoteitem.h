@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QListWidgetItem>
 
+#include "common.h"
+
 namespace Ui {
 class remoteItem;
 }

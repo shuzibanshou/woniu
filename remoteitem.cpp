@@ -21,12 +21,17 @@ remoteItem::~remoteItem()
  */
 void remoteItem::setData(deviceItem di)
 {
-    //文本在label溢出则显示...
+    //设置远程主机系统图标
+    QStringList osInfoList = di.deviceOS.split("-");
+    getSysIcon(ui->sysIcon,osInfoList[0],osInfoList[1]);
+    //设置远程主机名 文本在label溢出则显示 "..."
     QString text(di.deviceName);
     QFontMetrics metrics(ui->deviceName->font());
     QString elidedText = metrics.elidedText(text, Qt::ElideRight, ui->deviceName->width());
     ui->deviceName->setText(elidedText);
+    //设置远程主机ip
     ui->deviceIPv4->setText(di.deviceIPv4);
+    //动态设置属性
     ui->sendFile->setProperty("ip",di.deviceIPv4);
     ui->sendMsg->setProperty("ip",di.deviceIPv4);
 }
