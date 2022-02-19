@@ -636,6 +636,8 @@ void woniu::parseServerMessage(QByteArray data)
 
             }
 
+        } else {
+            qDebug() << "empty";
         }
     }
 }
@@ -705,6 +707,7 @@ void woniu::sendFile(quint64 index)
 {
     qint64 sendUnit = 4096;
     quint64 unitBytes = 0;      //每次实际发送字节数
+
     do {
         QByteArray buff = files.at(index)->read(sendUnit);
         unitBytes = buff.length();
@@ -712,7 +715,10 @@ void woniu::sendFile(quint64 index)
             unitBytes = tcpSocketFileClient->write(buff);
             if(unitBytes > 0){
                 fileSentSize += unitBytes;
-                sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+                //降低setValue速度 修复黑屏
+                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
+                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+                }
             }
         }
     } while(unitBytes > 0);

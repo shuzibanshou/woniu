@@ -21,3 +21,8 @@ void progress::setValue(qint32 val)
     ui->progressBar->setValue(val);
 }
 
+qint32 progress::getValue()
+{
+    return ui->progressBar->value();
+}
+
