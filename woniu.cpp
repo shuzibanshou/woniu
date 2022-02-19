@@ -716,16 +716,15 @@ void woniu::sendFile(quint64 index)
         unitBytes = buff.length();
         if(unitBytes > 0){
             unitBytes = tcpSocketFileClient->write(buff);
-            if(unitBytes > 0){
-                fileSentSize += unitBytes;
-                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
-                    qDebug() << fileSentSize;
-                    qDebug() << sendProgress->getValue();
-
-                    qDebug() << fileSize;
-                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
-                }
-            }
+//            if(unitBytes > 0){
+//                fileSentSize += unitBytes;
+//                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
+////                    qDebug() << fileSentSize;
+////                    qDebug() << sendProgress->getValue();
+////                    qDebug() << fileSize;
+////                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+//                }
+//            }
         }
     } while(unitBytes > 0);
 }
@@ -786,8 +785,17 @@ void woniu::modifySaveFilePath(QString newSaveFilePath)
     saveDirPath = newSaveFilePath;
 }
 
-void woniu::updateClientProgress(qint64 writtenLen){
-    qDebug() << "update client progress"-writtenLen;
+void woniu::updateClientProgress(qint64 sentLen){
+    if(sentLen > 0 && preparedSend > 0){
+       fileSentSize += static_cast<quint64>(sentLen);
+       if(fileSentSize - ((static_cast<quint32>(sendProgress->getValue()) * fileSize) / 100) >= (fileSize / 100)){
+           //qDebug() << fileSentSize;
+           //qDebug() << sendProgress->getValue();
+
+           //qDebug() << fileSize;
+           sendProgress->setValue(static_cast<qint32>((static_cast<float>(fileSentSize)/fileSize)*100));
+       }
+   }
 }
 
 //////
