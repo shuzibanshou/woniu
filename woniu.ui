@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>390</width>
-    <height>544</height>
+    <height>490</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,10 +35,12 @@
 	padding:5px 5px 5px 5px;
 	background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
 stop:0 #c2e9fb,stop:1 #a1c4fd);
+	border:none;
 }
 QListWidget::item{
 	background-color:rgb(255, 126, 90);
 	margin-bottom:5px;
+	outline:none;
 }</string>
     </property>
    </widget>
@@ -103,6 +105,7 @@ stop:0 #c2e9fb,stop:1 #a1c4fd);
            <widget class="QLabel" name="localNameLabel">
             <property name="font">
              <font>
+              <weight>50</weight>
               <bold>false</bold>
              </font>
             </property>
@@ -171,6 +174,7 @@ stop:0 #c2e9fb,stop:1 #a1c4fd);
            <widget class="QLabel" name="localIPv4Label">
             <property name="font">
              <font>
+              <weight>50</weight>
               <bold>false</bold>
               <stylestrategy>PreferAntialias</stylestrategy>
               <kerning>false</kerning>

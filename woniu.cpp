@@ -5,14 +5,14 @@
 #include "sendmsg.h"
 #include "receivemsg.h"
 #include "progress.h"
-#include "remoteitem.h"
+
 
 #include "common.h"
 
 woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
 {
     ui->setupUi(this);
-    this->setFixedSize(QSize(380,530));
+    this->setFixedSize(QSize(390,530));
     //qsrand(QTime::currentTime().msec());
     getSysIcon();
     localIPv4 = getHostIP();
@@ -332,7 +332,7 @@ void woniu::onSocketReadyRead()
 void woniu:: addWidgetItem(QString key,deviceItem di){
     QListWidgetItem* item = new  QListWidgetItem(ui->remoteDevice);
     //设置每个item的尺寸
-    item->setSizeHint(QSize(300,50));
+    item->setSizeHint(QSize(380,55));
     //保存该item
     newLanDevices[key].item = item;
 
@@ -384,11 +384,11 @@ void woniu:: addWidgetItem(QString key,deviceItem di){
 //    itemWidget->setLayout(layout);
 
     //封装item widget
-    remoteItem* itemWidget = new remoteItem;
-
+    remoteItem* itemWidget = new remoteItem(this);
+    itemWidget->setData(di);
     ui->remoteDevice->setItemWidget(item,itemWidget);
 
-    //ui->remoteDevice->setStyleSheet("QListWidget::item{background-color:red;}"); //无效
+    //ui->remoteDevice->setStyleSheet("QListWidget::item{background-color:red;}"); //无效?
     //是否会内存泄漏
     //connect(sendFile,SIGNAL(clicked()),this,SLOT(openFile()));
     //connect(sendMsg,SIGNAL(clicked()),this,SLOT(openMsgDialog()));

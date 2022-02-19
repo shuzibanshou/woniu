@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>50</height>
+    <width>380</width>
+    <height>55</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,17 +30,17 @@
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 255, 255);
-color:rgb(255,126,90);
+color:#8291F6;
 border-radius:13px 13px 13px 13px;</string>
    </property>
    <property name="text">
     <string>发送消息</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="sendFile">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>200</x>
      <y>12</y>
      <width>75</width>
      <height>26</height>
@@ -55,66 +55,67 @@ border-radius:13px 13px 13px 13px;</string>
     <string>发送文件</string>
    </property>
   </widget>
+  <widget class="QLabel" name="sysIcon">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>1</y>
+     <width>48</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="sysIcon.qrc">:/sysIcon/icons/redhat.png</pixmap>
+   </property>
+  </widget>
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>0</y>
-     <width>137</width>
-     <height>50</height>
+     <x>60</x>
+     <y>10</y>
+     <width>122</width>
+     <height>37</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QLabel" name="sysIcon">
-      <property name="text">
-       <string/>
+     <widget class="QLabel" name="deviceName">
+      <property name="font">
+       <font>
+        <family>思源黑体 CN Heavy</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
-      <property name="pixmap">
-       <pixmap resource="sysIcon.qrc">:/sysIcon/icons/redhat.png</pixmap>
+      <property name="styleSheet">
+       <string notr="true">color:white;</string>
+      </property>
+      <property name="text">
+       <string>localhost</string>
       </property>
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>0</number>
+     <widget class="QLabel" name="deviceIPv4">
+      <property name="font">
+       <font>
+        <family>思源黑体 CN Heavy</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
-      <item>
-       <widget class="QLabel" name="deviceName">
-        <property name="font">
-         <font>
-          <family>思源黑体 CN Heavy</family>
-          <pointsize>12</pointsize>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color:white;</string>
-        </property>
-        <property name="text">
-         <string>localhost</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="deviceIPv4">
-        <property name="font">
-         <font>
-          <family>思源黑体 CN Heavy</family>
-          <pointsize>10</pointsize>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color:rgb(255, 255, 255)</string>
-        </property>
-        <property name="text">
-         <string>192.168.1.1</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <property name="styleSheet">
+       <string notr="true">color:rgb(255, 255, 255)</string>
+      </property>
+      <property name="text">
+       <string>192.168.172.178</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

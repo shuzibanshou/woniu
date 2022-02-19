@@ -25,6 +25,7 @@
 
 #include "progress.h"
 #include "receivefile.h"
+#include "remoteitem.h"
 
 namespace Ui {
 class woniu;
@@ -42,15 +43,6 @@ enum MessageType{
     receiveSingleFile = 0x08,       //单个文件接收完毕
 };
 
-//定义设备信息结构体
-typedef struct
-{
-    QString deviceOS;
-    QString deviceName;
-    QString deviceIPv4;
-    QListWidgetItem* item;  //关联的widgetItem指针
-    quint64 timestamp;      //最新广播UDP时间戳
-} deviceItem;
 
 class woniu : public QMainWindow
 {
