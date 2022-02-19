@@ -660,6 +660,7 @@ void woniu::parseClientMessage(QByteArray data)
             //打开传输进度窗口 读取文件并发送
             sendProgress = new progress(this);
             sendProgress->setRange(0,100);
+            sendProgress->setValue(0);
             sendProgress->show();
 
             //qDebug() << "接收方已同意,开始分块并发送多个文件";
