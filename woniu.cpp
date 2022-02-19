@@ -602,10 +602,8 @@ void woniu::parseServerMessage(QByteArray data)
             len = receiveFileHandle.write(data);
             //qDebug() << len;
             if(len > 0){
-                //接收成功
                 curSaveFileSize += len;
                 curSaveFileTotalSize += len;
-                //qDebug() << "接收成功" << curSaveFileSize;
                 recvProgress->setValue(((float)curSaveFileTotalSize/saveFileSize)*100);
             }
             //单个文件传输完成
@@ -706,29 +704,6 @@ void woniu::sendFile(quint64 index)
     } while(unitBytes > 0);
 }
 
-/**
- * 在界面上设置系统图标
- * @brief woniu::getSysIcon
- */
-//void woniu::getSysIcon()
-//{
-//    QString osType = QSysInfo::productType().toLower();
-//    QString osVersion = QSysInfo::productVersion();
-//    if(osType == "macos"){
-//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/macos.png"));
-//    } else if(osType == "ios"){
-//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/iphone.png"));
-//    } else if(osType == "ubuntu" || osType == "centos" || osType == "redhat" || osType == "debian" || osType == "suse" || osType == "android"){
-//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/"+osType+".png"));
-//    } else if(osType == "windows"){
-//        QList<QString> ver = osVersion.split(".");
-//        QString bigVer = ver.at(0);
-//        ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/windows-"+bigVer+".png"));
-//    } else {
-//         ui->sysIcon->setPixmap(QPixmap(":/sysIcon/icons/linux.png"));
-//    }
-//    //qDebug() << osVersion;
-//}
 
 
 
