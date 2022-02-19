@@ -17,7 +17,7 @@ public:
 
     void setRange(qint32,qint32);
     void setValue(qint32);
-
+    qint32 getValue();
 private:
     Ui::progress *ui;
 };
