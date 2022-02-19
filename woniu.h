@@ -146,6 +146,7 @@ private slots:
     void rejectFile();                                              //拒收文件
     void modifySaveFilePath(QString);                               //修改文件保存路径
     //void retransMissionPacket();                                  //重发UDP数据包
+    void updateClientProgress(qint64);                              //更新客户端发送进度条
 };
 
 

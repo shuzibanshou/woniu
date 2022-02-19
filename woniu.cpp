@@ -66,8 +66,10 @@ woniu::woniu(QWidget *parent) :QMainWindow(parent),ui(new Ui::woniu)
     //有新连接到达服务端
     connect(tcpSocketFileServer,SIGNAL(newConnection()),this,SLOT(onNewConnection()));
     connect(tcpSocketMsgServer,SIGNAL(newConnection()),this,SLOT(onNewMsgConnection()));
-    //文件发送方准备读取数据（文件接收方发送的消息格式数据，非文件内容）
+    //文件发送方读取网络数据（文件接收方发送的消息格式数据，非文件内容）
     connect(tcpSocketFileClient,SIGNAL(readyRead()),this,SLOT(onClientReadyRead()));
+    //当数据发送成功时，更新进度条
+    connect(tcpSocketFileClient,SIGNAL(bytesWritten(qint64)),this,SLOT(updateClientProgress(qint64)));
 
     //收发文件信号槽
 //    QMap<QString, QTcpSocket*>::iterator tcpClientIter = tcpSocketFileClientList.begin();
@@ -713,13 +715,12 @@ void woniu::sendFile(quint64 index)
         unitBytes = buff.length();
         if(unitBytes > 0){
             unitBytes = tcpSocketFileClient->write(buff);
-            if(unitBytes > 0){
-                fileSentSize += unitBytes;
-                //降低setValue速度 修复黑屏
-                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
-                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
-                }
-            }
+//            if(unitBytes > 0){
+//                fileSentSize += unitBytes;
+//                if(fileSentSize - ((sendProgress->getValue() * fileSize) / 100) >= (fileSize / 100)){
+//                    sendProgress->setValue(((float)fileSentSize/fileSize)*100);
+//                }
+//            }
         }
     } while(unitBytes > 0);
 }
@@ -778,6 +779,10 @@ void woniu::rejectFile()
 void woniu::modifySaveFilePath(QString newSaveFilePath)
 {
     saveDirPath = newSaveFilePath;
+}
+
+void woniu::updateClientProgress(qint64 writtenLen){
+    qDebug() << writtenLen;
 }
 
 //////
