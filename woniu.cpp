@@ -605,6 +605,11 @@ void woniu::parseServerMessage(QByteArray data)
                 curSaveFileSize += len;
                 curSaveFileTotalSize += len;
                 recvProgress->setValue(((float)curSaveFileTotalSize/saveFileSize)*100);
+            } else {
+                tcpSocketFileClientList->write(QByteArray().append(MessageType::transferDisturb));
+                //写入失败 可能磁盘空间不足
+                QMessageBox::critical(this, "成功",QString("文件写入失败，请检查磁盘空间"),QMessageBox::Ok,QMessageBox::Ok);
+                return;
             }
             //单个文件传输完成
             if(curSaveFileSize == receiveFiles.at(curReceiveFileIndex).split("##")[1].toULongLong()){
@@ -664,8 +669,8 @@ void woniu::parseClientMessage(QByteArray data)
                 ++curFileIndex;
                 sendFile(curFileIndex);
             } else {
-                qDebug() << "文件发送完毕";
-                //文件发送完毕 清空变量 进行清扫工作
+                qDebug() << "文件全部发送完毕";
+                //文件全部发送完毕 清空变量 进行清扫工作
                 fileSentSize = preparedSend = fileSize = curFileIndex = 0;
                 sendProgress->close();
                 foreach(auto pFile,files){
@@ -675,7 +680,16 @@ void woniu::parseClientMessage(QByteArray data)
                 }
                 files.clear();
             }
-
+        } else if(MessageType::transferDisturb == first){
+            //传输中断
+            fileSentSize = preparedSend = fileSize = curFileIndex = 0;
+            sendProgress->close();
+            foreach(auto pFile,files){
+                if(pFile->isOpen()){
+                    pFile->close();
+                }
+            }
+            files.clear();
         }
 //    } else {
 

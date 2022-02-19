@@ -41,6 +41,7 @@ enum MessageType{
     recUdpPackSucc = 0x06,          //UDP包接收成功反馈通知
     recUdpPackFail = 0x07,          //UDP包接收失败反馈通知
     receiveSingleFile = 0x08,       //单个文件接收完毕
+    transferDisturb = 0x09          //传输中断
 };
 
 
